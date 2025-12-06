@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -9,8 +9,24 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --color-deep-koamaru-50: hsl(225 100% 99%);
+    --color-deep-koamaru-100: hsl(238 100% 95%);
+    --color-deep-koamaru-200: hsl(238 100% 89%);
+    --color-deep-koamaru-300: hsl(236 100% 84%);
+    --color-deep-koamaru-400: hsl(234 100% 78%);
+    --color-deep-koamaru-500: hsl(231 100% 72%);
+    --color-deep-koamaru-600: hsl(226 100% 64%);
+    --color-deep-koamaru-700: hsl(224 100% 55%);
+    --color-deep-koamaru-800: hsl(225 82% 45%);
+    --color-deep-koamaru-900: hsl(224 81% 33%);
+    --color-deep-koamaru-1000: hsl(224 84% 30%);
+    --color-deep-koamaru-1100: hsl(225 90% 27%);
+    --color-deep-koamaru-1200: hsl(226 93% 23%);
+    --color-deep-koamaru-1300: hsl(228 98% 19%);
+    --color-deep-koamaru-1400: hsl(228 98% 16%);
 }
 
 @theme inline {
@@ -121,34 +137,34 @@
 }
 
 @layer base {
-  :root {
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-  }
+    :root {
+        --sidebar: oklch(0.985 0 0);
+        --sidebar-foreground: oklch(0.145 0 0);
+        --sidebar-primary: oklch(0.205 0 0);
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+        --sidebar-accent: oklch(0.97 0 0);
+        --sidebar-accent-foreground: oklch(0.205 0 0);
+        --sidebar-border: oklch(0.922 0 0);
+        --sidebar-ring: oklch(0.708 0 0);
+    }
 
-  .dark {
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.439 0 0);
-  }
+    .dark {
+        --sidebar: oklch(0.205 0 0);
+        --sidebar-foreground: oklch(0.985 0 0);
+        --sidebar-primary: oklch(0.488 0.243 264.376);
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+        --sidebar-accent: oklch(0.269 0 0);
+        --sidebar-accent-foreground: oklch(0.985 0 0);
+        --sidebar-border: oklch(1 0 0 / 10%);
+        --sidebar-ring: oklch(0.439 0 0);
+    }
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+    body {
+        @apply bg-background text-foreground;
     }
 }

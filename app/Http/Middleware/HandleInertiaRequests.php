@@ -37,7 +37,56 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+            'sidebar' => config('sidebar'),
         ];
     }
 }
+
+
+//EN ARHIVOS COMO ESTOS ES DONDE SE RECOMIENDA CREAR LOS MIDDLEWARE
+// 1. Crear el middleware
+// php artisan make:middleware CheckSubscription
+
+// 2. Se crea en: app/Http/Middleware/CheckSubscription.php
+// namespace App\Http\Middleware;
+// class CheckSubscription
+// {
+//     public function handle($request, Closure $next)
+//     {
+//         if (!auth()->user()->isSubscribed()) {
+//             return redirect('/pricing');
+//         }
+//         return $next($request);
+//     }
+// }
+
+// 3. En bootstrap/app.php - AGREGARLO al grupo web
+// ->withMiddleware(function (Middleware $middleware) {
+//     $middleware->web(append: [
+//         HandleInertiaRequests::class,
+//         \App\Http\Middleware\CheckSubscription::class, // ← ¡Añadido!
+//     ]);
+// });
+
+
+// OPCIÓN 2: Directamente en la closure (NO recomendado)
+// // bootstrap/app.php
+// ->withMiddleware(function (Middleware $middleware) {
+//     $middleware->web(append: [
+//         HandleInertiaRequests::class,
+        
+//         // Middleware inline (mala práctica)
+//         function ($request, $next) {
+//             if (!auth()->check()) {
+//                 return redirect('/login');
+//             }
+//             return $next($request);
+//         },
+        
+//         // Otro middleware inline
+//         function ($request, $next) {
+//             // Lógica aquí...
+//             return $next($request);
+//         },
+//     ]);
+// });

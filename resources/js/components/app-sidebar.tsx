@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, CirclePlus , LucideIcon, Search, CreditCard } from "lucide-react"
 
 import {
   Sidebar,
@@ -12,57 +12,53 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+import { usePage, Link  } from "@inertiajs/react";
 // Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-]
+type SidebarItem = {
+  label: string;
+  route: string;
+  icon: string;
+  roles: string[];
+};
+
+type InertiaProps = {
+  sidebar: SidebarItem[];
+};
+
+const iconMap: Record<string, LucideIcon> = {
+  calendar: Calendar,
+  search: Search,
+  add: CirclePlus,
+  creditcard: CreditCard,
+};
 
 export function AppSidebar() {
-
-
+const { sidebar } = usePage<InertiaProps>().props;
+  
   return (
-    <Sidebar variant="inset"  collapsible="icon" >
-      <SidebarContent className="bg-neutral-200">
+    <Sidebar variant="inset" collapsible="icon" className="p-0" >
+      <SidebarContent className="bg-deep-koamaru-900/90 text-deep-koamaru-50">
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-bold text-deep-koamaru-50">Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                   
+              {sidebar.map((item) => {
+                const Icon = iconMap[item.icon] ?? Home
+
+                return (
+                  <SidebarMenuItem key={item.route}>
+                    <SidebarMenuButton asChild>
+                    <Link href={item.label}>
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Link>
                   </SidebarMenuButton>
-                  <SidebarMenuBadge>24</SidebarMenuBadge>
-                </SidebarMenuItem>
-              ))}
+
+                 
+                    {/* <SidebarMenuBadge>24</SidebarMenuBadge> */}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
