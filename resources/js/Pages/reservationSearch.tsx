@@ -20,6 +20,15 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 type SidebarItem = {
     label: string;
     route: string;
@@ -29,41 +38,72 @@ type SidebarItem = {
 type PageProps = {
     sidebar: SidebarItem[];
 };
+type DataHeader = string[]
+
 function ReservationSearch() {
     const { sidebar } = usePage<PageProps>().props;
     const title = sidebar.filter((item) => item.label === "Search Reservation");
+    const dataHeader = [
+        "Customer",
+        "Admin",
+        "Date",
+        "Start Time",
+        "End Time",
+        "Payment Status",
+        "Reservation Status",
+        "Actions",
+    ];
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
                 <h1 className="text-gray-950"> {title[0].label}</h1>
             </div>
-           <div className="flex justify-between">
-             <Button type="button" variant="outline">
+            <Button type="button" variant="outline">
                 New Reservation
             </Button>
-            <div className="flex w-fit gap-2">
-                <Input type="text" placeholder="Reservation ID" />
-                <Button type="button" variant="outline">
-                    Search
-                </Button>
+            <div className="flex justify-between">
+                <div className="flex items-center gap-2">
+                    <p>Show</p>
+                    <Select>
+                        <SelectTrigger className="w-20">
+                            <SelectValue placeholder="5" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Fruits</SelectLabel>
+                                <SelectItem value="apple">Apple</SelectItem>
+                                <SelectItem value="banana">Banana</SelectItem>
+                                <SelectItem value="blueberry">
+                                    Blueberry
+                                </SelectItem>
+                                <SelectItem value="grapes">Grapes</SelectItem>
+                                <SelectItem value="pineapple">
+                                    Pineapple
+                                </SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <p>registers</p>
+                </div>
+                <div className="flex w-fit gap-2">
+                    <Input type="text" placeholder="Reservation ID" />
+                    <Button type="button" variant="outline">
+                        Search
+                    </Button>
+                </div>
             </div>
-           </div>
             <Table>
                 <TableCaption>A list of your recent invoices.</TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px]">Invoice</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead className="text-right">Amount</TableHead>
+                        {dataHeader.map(function (item) {
+                           return  <TableHead className="w-[100px]" key={item}>{item}</TableHead>;
+                        })}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
-                        <TableCell className="font-medium">INV001</TableCell>
-                        <TableCell>Paid</TableCell>
-                        <TableCell>Credit Card</TableCell>
-                        <TableCell className="text-right">$250.00</TableCell>
+                        <TableCell>INV001</TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

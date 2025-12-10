@@ -3,13 +3,13 @@
 return [
     [
         'label' => 'New Reservation',
-        'route' => 'reservations.index',
+        'route' => '/reservation/create',
         'icon'  => 'add',
         'roles' => ['admin', 'user'],
     ],
     [
         'label' => 'Search Reservation',
-        'route' => 'reservations.search',
+        'route' => '/reservation/search',
         'icon'  => 'search',
         'roles' => ['admin'],
     ],
