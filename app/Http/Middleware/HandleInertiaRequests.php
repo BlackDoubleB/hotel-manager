@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
+// En Inertia, HandleInertiaRequests casi siempre se usa para modificar la response, no la request, porque agrega datos que React recibirá como props.
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -38,6 +39,13 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'sidebar' => config('sidebar'),
+            'auth' => [
+            'user' => $request->user() ? [
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+                'email' => $request->user()->email,
+            ] : null,
+        ],
         ];
     }
 }

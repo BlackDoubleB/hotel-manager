@@ -19,20 +19,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
+import { SidebarProps, PageProps } from "@/types";
 import { usePage, Link, router } from "@inertiajs/react";
 import { Button } from "./ui/button";
-// Menu items.
-type SidebarItem = {
-    label: string;
-    route: string;
-    icon: string;
-    roles: string[];
-};
-
-type InertiaProps = {
-    sidebar: SidebarItem[];
-};
 
 const iconMap: Record<string, LucideIcon> = {
     calendar: Calendar,
@@ -42,14 +31,18 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 export function AppSidebar() {
-    const { sidebar } = usePage<InertiaProps>().props;
+    const { sidebar } = usePage<SidebarProps>().props;
+    const { auth } = usePage<PageProps>().props;
 
     return (
         <Sidebar variant="inset" collapsible="icon" className="p-0">
             <SidebarContent className="bg-deep-koamaru-900/90 text-deep-koamaru-50">
                 <SidebarGroup className="h-full grid grid-rows-[auto_auto_1fr] ">
                     <SidebarGroupLabel className="font-bold text-deep-koamaru-50">
-                        Application
+                        Hotel Manager
+                    </SidebarGroupLabel>
+                    <SidebarGroupLabel className="font-bold text-deep-koamaru-50">
+                        Welcome: {auth.user?.name}
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
