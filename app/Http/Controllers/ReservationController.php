@@ -16,14 +16,22 @@ class ReservationController extends Controller
         return Inertia::render('reservationSearch');
     }
 
-    public function AvailabilityHours(Request $rq, AvailabilityService $as){
+    public function AvailabilityStartHours(Request $rq, AvailabilityService $as){
         $roomId = (int) $rq->query('room');
         $dateTime = $rq->query('date');
-        $hoursAvailability = $as->DateTimesAvailable($roomId, $dateTime);
+        $hoursAvailability = $as->DateTimesStartAvailable($roomId, $dateTime);
         return response()->json([
-            'hours' => $hoursAvailability
+            'hours_start' => $hoursAvailability
         ]);
         
+    }               
+    public function AvailabilityEndHours(Request $rq, AvailabilityService $as){
+        $listHours =  $rq->query('listHoursStart');
+        $dateStart = $rq->query('hourStartSelected');
+        $hoursAvailability = $as->DateTimesEndAvaible($listHours, $dateStart);
+        return response()->json([
+            'hours_end' => $hoursAvailability
+        ]);
     }
     
     

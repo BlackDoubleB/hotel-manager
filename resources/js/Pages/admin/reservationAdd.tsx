@@ -31,14 +31,16 @@ type Room = {
 };
 type ReservationAddProps = {
     numberRoom: Room[];
-    hoursR?: string[];
 };
 
-type Avaible= {
-    hours: string[];
-}
+type DataHoursStart = {
+    hours_start: string[];
+};
+type DataHoursEnd = {
+    hours_end: string[];
+};
 
-function ReservationAdd({ numberRoom, hoursR }: ReservationAddProps) {
+function ReservationAdd({ numberRoom }: ReservationAddProps) {
     const { sidebar } = usePage<SidebarProps>().props;
     const title = sidebar.filter((item) => item.label === "New Reservation");
     const { auth } = usePage<PageProps>().props;
@@ -46,21 +48,48 @@ function ReservationAdd({ numberRoom, hoursR }: ReservationAddProps) {
     const [open, setOpen] = React.useState(false);
     const [date, setDate] = React.useState<Date | undefined>(undefined);
     const [room, setRoom] = React.useState<string>("");
-    let [dataDateAvaible, setDataDateAvaible] = React.useState<Avaible>({ hours: [] });
+    const [hourStart, setHourStart] = React.useState<string>("");
+    const [hourEnd, setHourEnd] = React.useState<string>("");
+
+    let [dataDateStartAvaible, setDataDateStartAvaible] =
+        React.useState<DataHoursStart>({ hours_start: [] });
+    let [dataDateEndAvaible, setDataDateEndAvaible] =
+        React.useState<DataHoursEnd>({ hours_end: [] });
+
     const datePicker = new Date();
     const matcher: DateBefore = { before: datePicker };
-   
+
     useEffect(() => {
         if (auth.user?.name) setSelected(auth.user.name);
     }, [auth.user?.name]);
 
     function handleChangeDateTime() {
-        const consultDate = { date: date, room: room };
-        axios.get("/datetime", { params: consultDate }).then(function(response){
-            console.log('esto ',response.data);
-            setDataDateAvaible(response.data)
-        });
+        const selectDate = { date: date, room: room };
+        axios
+            .get("/dateStartTime", { params: selectDate })
+            .then(function (response) {
+                console.log("esto ", response.data);
+                setDataDateStartAvaible(response.data);
+            });
     }
+    function handleChangeEndTime() {
+        const selectHourStart = {
+            hourStartSelected: hourStart,
+            listHoursStart: dataDateStartAvaible.hours_start,
+        };
+        axios
+            .get("/dateEndTime", { params: selectHourStart })
+            .then(function (response) {
+                console.log("horas fin", response.data);
+                setDataDateEndAvaible(response.data);
+            });
+    }
+
+    useEffect(() => {
+        if(hourStart){
+            handleChangeEndTime();
+        }
+    }, [hourStart])
 
     useEffect(() => {
         if (room.trim() && date !== undefined) {
@@ -72,7 +101,7 @@ function ReservationAdd({ numberRoom, hoursR }: ReservationAddProps) {
             <div className="border-b border-deep-koamaru-100 pb-5">
                 <h1 className="text-gray-950"> {title[0].label}</h1>
             </div>
-            
+
             <div className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
                 <div className="grid w-full max-w-sm items-center gap-3">
                     <Label htmlFor="client">Cliente</Label>
@@ -164,13 +193,19 @@ function ReservationAdd({ numberRoom, hoursR }: ReservationAddProps) {
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-3">
                     <Label htmlFor="texto">Hora de Inicio</Label>
-                    <Select>
+                    <Select onValueChange={setHourStart}>
                         <SelectTrigger>
                             <SelectValue placeholder="Theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            {dataDateAvaible.hours.map(function(houra){
-                                return (<SelectItem value={houra} key={houra}>{houra}</SelectItem>)
+                            {dataDateStartAvaible.hours_start.map(function (
+                                hour
+                            ) {
+                                return (
+                                    <SelectItem value={hour} key={hour}>
+                                        {hour}
+                                    </SelectItem>
+                                );
                             })}
                         </SelectContent>
                     </Select>
@@ -182,9 +217,13 @@ function ReservationAdd({ numberRoom, hoursR }: ReservationAddProps) {
                             <SelectValue placeholder="Theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
+                            {dataDateEndAvaible.hours_end.map(function(hour) {
+                                return (
+                                    <SelectItem value={hour} key={hour}>
+                                        {hour}
+                                    </SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
                 </div>

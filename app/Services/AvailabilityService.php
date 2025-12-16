@@ -25,7 +25,7 @@ class AvailabilityService
         }
         return $room_hours_busy;
     }
-    public function DateTimesAvailable($room_id, $date)
+    public function DateTimesStartAvailable($room_id, $date)
     {
         $hours = [];
 
@@ -37,26 +37,49 @@ class AvailabilityService
 
 
         if (!empty($room_time_busy)) {
-            $index_start = 0;
-            $index_end = 0;
+
             foreach ($hours as $hour) {
                 foreach ($room_time_busy as $rtb) {
                     if ($hour == $rtb[0]) {
                         $index_start = array_search($hour, $hours);
                         foreach ($room_time_busy as $rtb) {
                             if ($hour == $rtb[1]) {
+                                $index_start = 0;
+                                $index_end = 0;
                                 $index_end = array_search($hour, $hours);
+                                for ($i = $index_start; $i <= $index_end; $i++) {
+                                    $hours[$i] = $hours[$i];
+                                    $index_start = 0;
+                                    $index_end = 0;
+                                }
                             }
                         }
                     }
                 }
             }
-            for ($i = $index_start; $i <= $index_end; $i++) {
-                $hours[$i] = $hours[$i] . "busy";
-            }
-            return $hours;
         }
-
         return $hours;
+    }
+
+    public function DateTimesEndAvaible($listHours, $dateStart)
+    {
+        $newHours = [];
+        $ds = preg_replace('/:.*/', '', $dateStart);
+        foreach ($listHours as $hour) {
+            $h = preg_replace('/:.*/', '', $hour);
+            
+            if (intval($h) > intval($ds)) {
+                if(!in_array($hour,$newHours)){
+                    if (in_array($hour, $listHours)) {
+                    $numberAddd = (string) ((int) $hour + 1);
+                    $hourFormatted = sprintf("%02d:00:00", (int)$numberAddd);
+                    $newHours[] = $hour;
+                    $newHours[] = $hourFormatted;
+                }
+                }
+                
+            }
+        }
+        return $newHours;
     }
 }
