@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AvailabilityService;
+use App\Services\HoursService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\RoomData;
@@ -16,23 +16,21 @@ class ReservationController extends Controller
         return Inertia::render('reservationSearch');
     }
 
-    public function AvailabilityStartHours(Request $rq, AvailabilityService $as){
+    public function AvailabilityStartHours(Request $rq, HoursService $h){
         $roomId = (int) $rq->query('room');
         $dateTime = $rq->query('date');
-        $hoursAvailability = $as->DateTimesStartAvailable($roomId, $dateTime);
+        $hoursAvailability = $h->DateTimesStartAvailable($roomId, $dateTime);
         return response()->json([
             'hours_start' => $hoursAvailability
         ]);
         
     }               
-    public function AvailabilityEndHours(Request $rq, AvailabilityService $as){
+    public function AvailabilityEndHours(Request $rq, HoursService $h){
         $listHours =  $rq->query('listHoursStart');
         $dateStart = $rq->query('hourStartSelected');
-        $hoursAvailability = $as->DateTimesEndAvaible($listHours, $dateStart);
+        $hoursAvailability = $h->DateTimesEndAvaible($listHours, $dateStart);
         return response()->json([
             'hours_end' => $hoursAvailability
         ]);
     }
-    
-    
 }

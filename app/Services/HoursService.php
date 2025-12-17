@@ -5,12 +5,8 @@ namespace App\Services;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Log;
 
-class AvailabilityService
+class HoursService
 {
-
-
-    public function __construct() {}
-
     public function DateTimesBusy($room_id, $date)
     {
         $reservacion = Reservation::all();
@@ -29,7 +25,7 @@ class AvailabilityService
     public function DateTimesStartAvailable($room_id, $date)
     {
         date_default_timezone_set('America/Lima');
-        $date_mod = str_replace('-', '/', substr($date, 0, 10));
+        $date_mod = substr(str_replace('-', '/', substr($date, 0, 10)), -8);
         Log::info('date cliente' . $date_mod);
         Log::info('date sisitema' . date("y/m/d"));
         $hours = [];
@@ -77,16 +73,17 @@ class AvailabilityService
         }
         
         if ($date_mod == date("y/m/d")) {
+            Log::info('INGRESO AQUI');
             $hours = array_values(array_filter($hours, function ($h) {
                 return substr($h, -2) !== '59' && (intval(substr($h, 0, 2)) > intval(substr(date("H:i:s"), 0, 2)));
             }));
         } else {
+            Log::info('INGRESO AQUI  2 ');
             $hours = array_values(array_filter($hours, function ($h) {
                 return substr($h, -2) !== '59';
             }));
         }
 
-        // 2025-12-17T05:00:00
         return $hours;
     }
 
