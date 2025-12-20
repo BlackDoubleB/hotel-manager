@@ -1,3 +1,4 @@
+import { number } from "zod";
 
 //menu items
 type SidebarItem = {
@@ -10,11 +11,20 @@ type SidebarItem = {
 type SidebarProps = {
     sidebar: SidebarItem[];
 };
+
 export type AuthUser = {
   id: number;
   name: string;
   email: string;
 };
+
+type AmountItem ={
+  price : number
+}
+
+export type AmountProps = {
+  amount : AmountItem[]; 
+}
 
 export type AuthProps = {
   user: AuthUser | null;

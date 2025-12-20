@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { SidebarProps, PageProps } from "@/types";
+import { SidebarProps, PageProps, AmountProps } from "@/types";
 import { useEffect, useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -39,22 +39,34 @@ type DataHoursStart = {
 type DataHoursEnd = {
     hours_end: string[];
 };
+type DataStatusReserv = {
+    status_reserv: string[];
+};
 
+type DataStatusPayment = {
+    status_payment: string[];
+};
+
+type ItemAmountPayment = [number, number];
+type DataAmountPayment = {
+    amount_payment: ItemAmountPayment[];
+}
 function ReservationAdd({ numberRoom }: ReservationAddProps) {
-    const { sidebar } = usePage<SidebarProps>().props;
-    const title = sidebar.filter((item) => item.label === "New Reservation");
     const { auth } = usePage<PageProps>().props;
-    const [selected, setSelected] = useState("");
-    const [open, setOpen] = React.useState(false);
-    const [date, setDate] = React.useState<Date | undefined>(undefined);
-    const [room, setRoom] = React.useState<string>("");
-    const [hourStart, setHourStart] = React.useState<string>("");
-    const [hourEnd, setHourEnd] = React.useState<string>("");
+    const { sidebar } = usePage<SidebarProps>().props;
+    const { status_reserv } = usePage<DataStatusReserv>().props;
+    const { status_payment } = usePage<DataStatusPayment>().props;
+    const { amount_payment } = usePage<DataAmountPayment>().props;
+    const title = sidebar.filter((item) => item.label === "New Reservation");
 
-    let [dataDateStartAvaible, setDataDateStartAvaible] =
-        React.useState<DataHoursStart>({ hours_start: [] });
-    let [dataDateEndAvaible, setDataDateEndAvaible] =
-        React.useState<DataHoursEnd>({ hours_end: [] });
+    const [selected, setSelected] = useState("");
+    const [open, setOpen] = useState(false);
+    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [room, setRoom] = useState<string>("");
+    const [hourStart, setHourStart] = useState<string>("");
+    const [hourEnd, setHourEnd] = useState<string>("");
+    let [dataDateStartAvaible, setDataDateStartAvaible] = useState<DataHoursStart>({ hours_start: [] });
+    let [dataDateEndAvaible, setDataDateEndAvaible] = useState<DataHoursEnd>({ hours_end: [] });
 
     const datePicker = new Date();
     const matcher: DateBefore = { before: datePicker };
@@ -80,28 +92,31 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
         axios
             .get("/dateEndTime", { params: selectHourStart })
             .then(function (response) {
-                console.log("horas fin", response.data);
                 setDataDateEndAvaible(response.data);
             });
     }
 
+
+
     useEffect(() => {
-        if(hourStart){
+        if (hourStart) {
             handleChangeEndTime();
         }
-    }, [hourStart])
+    }, [hourStart]);
 
     useEffect(() => {
         if (room.trim() && date !== undefined) {
             handleChangeDateTime();
         }
     }, [room, date]);
+    console.log("status_payment", status_payment);
+console.log("amount_payment", amount_payment);
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
                 <h1 className="text-gray-950"> {title[0].label}</h1>
             </div>
-
+            {/* <div>ESTO ES ESTATUS {status_reserv}</div> */}
             <div className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
                 <div className="grid w-full max-w-sm items-center gap-3">
                     <Label htmlFor="client">Cliente</Label>
@@ -217,7 +232,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             <SelectValue placeholder="Theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            {dataDateEndAvaible.hours_end.map(function(hour) {
+                            {dataDateEndAvaible.hours_end.map(function (hour) {
                                 return (
                                     <SelectItem value={hour} key={hour}>
                                         {hour}
@@ -234,9 +249,31 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             <SelectValue placeholder="Theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
+                            {status_reserv.map((x) => {
+                                return (
+                                    <SelectItem value={x} key={x}>
+                                        {x[1]}
+                                    </SelectItem>
+                                );
+                            })}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="grid w-full max-w-sm items-center gap-3">
+                    <Label htmlFor="texto">Estado del pago</Label>
+                    <Select>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {status_payment.map((x) => {
+                                return (
+                                    <SelectItem value={x[0]} key={x[1]}>
+                                        {x[1]}
+                                    </SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
                 </div>
@@ -247,22 +284,11 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             <SelectValue placeholder="Theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Estado del pago</Label>
-                    <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
+                            {amount_payment.map(([id, amount]) => (
+                                <SelectItem value={String(id)} key={id}>
+                                    {amount}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
