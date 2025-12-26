@@ -11,7 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { SidebarProps, PageProps, AmountProps } from "@/types";
+import {
+    SidebarProps,
+    PageProps,
+    AmountProps,
+    ReservationAddProps,
+    DataStatusReserv,
+    DataStatusPayment,
+    DataAmountPayment,
+    DataHoursStart,
+    DataHoursEnd,
+} from "@/types";
 import { useEffect, useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -23,34 +33,6 @@ import {
 import { DateBefore } from "react-day-picker";
 import axios from "axios";
 
-type Room = {
-    id: number;
-    room_number: number;
-    created_at: string;
-    updated_at: string;
-};
-type ReservationAddProps = {
-    numberRoom: Room[];
-};
-
-type DataHoursStart = {
-    hours_start: string[];
-};
-type DataHoursEnd = {
-    hours_end: string[];
-};
-type DataStatusReserv = {
-    status_reserv: string[];
-};
-
-type DataStatusPayment = {
-    status_payment: string[];
-};
-
-type ItemAmountPayment = [number, number];
-type DataAmountPayment = {
-    amount_payment: ItemAmountPayment[];
-}
 function ReservationAdd({ numberRoom }: ReservationAddProps) {
     const { auth } = usePage<PageProps>().props;
     const { sidebar } = usePage<SidebarProps>().props;
@@ -59,20 +41,27 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     const { amount_payment } = usePage<DataAmountPayment>().props;
     const title = sidebar.filter((item) => item.label === "New Reservation");
 
-    const [selected, setSelected] = useState("");
+    const [administrator, setAdministrator] = useState("");
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [room, setRoom] = useState<string>("");
     const [hourStart, setHourStart] = useState<string>("");
     const [hourEnd, setHourEnd] = useState<string>("");
-    let [dataDateStartAvaible, setDataDateStartAvaible] = useState<DataHoursStart>({ hours_start: [] });
-    let [dataDateEndAvaible, setDataDateEndAvaible] = useState<DataHoursEnd>({ hours_end: [] });
+    const [customer, setCustomer] = useState<string>("");
+    const [paymentStatus, setPaymentStatus] = useState<string>("");
+    const [paymentAmount, setPaymentAmount] = useState<string>("");
+    let [dataDateStartAvaible, setDataDateStartAvaible] =
+        useState<DataHoursStart>({ hours_start: [] });
+    let [dataDateEndAvaible, setDataDateEndAvaible] = useState<DataHoursEnd>({
+        hours_end: [],
+    });
 
     const datePicker = new Date();
     const matcher: DateBefore = { before: datePicker };
-
+    const status_interfaz_r = status_reserv[0][1];
+    const amount_interfaz_p = amount_payment[0][1];
     useEffect(() => {
-        if (auth.user?.name) setSelected(auth.user.name);
+        if (auth.user?.name) setAdministrator(auth.user.name);
     }, [auth.user?.name]);
 
     function handleChangeDateTime() {
@@ -96,8 +85,9 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             });
     }
 
-
-
+    function createReserv(){
+        
+    }
     useEffect(() => {
         if (hourStart) {
             handleChangeEndTime();
@@ -109,24 +99,33 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             handleChangeDateTime();
         }
     }, [room, date]);
-    console.log("status_payment", status_payment);
-console.log("amount_payment", amount_payment);
+
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
                 <h1 className="text-gray-950"> {title[0].label}</h1>
             </div>
-            {/* <div>ESTO ES ESTATUS {status_reserv}</div> */}
-            <div className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
+            <form id="reservAddForm" className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="client">Cliente</Label>
-                    <Input type="text" id="client" placeholder="Email" />
+                    <Label htmlFor="customer">
+                        Customer <span className="text-red-500">*</span>
+                    </Label>
+
+                    <Input
+                        value={customer}
+                        onChange={(e)=>setCustomer(e.target.value)}
+                        type="text"
+                        id="customer"
+                        placeholder="Full Name"
+                        className="bg-white"
+                    />
                 </div>
+
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="email">Administrator</Label>
+                    <Label htmlFor="administrator">Administrator</Label>
                     <Select
-                        value={selected}
-                        onValueChange={setSelected}
+                        value={administrator}
+                        onValueChange={setAdministrator}
                         disabled
                     >
                         <SelectTrigger className="disabled:cursor-default">
@@ -140,9 +139,10 @@ console.log("amount_payment", amount_payment);
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="date" className="px-1">
-                        Fecha de la Reserva
+                        Reservation Date <span className="text-red-500">*</span>
                     </Label>
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
@@ -186,11 +186,14 @@ console.log("amount_payment", amount_payment);
                         </PopoverContent>
                     </Popover>
                 </div>
+
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Room</Label>
-                    <Select onValueChange={setRoom}>
+                    <Label htmlFor="room">
+                        Room <span className="text-red-500">*</span>
+                    </Label>
+                    <Select value={room} onValueChange={setRoom} disabled={!date}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                             {numberRoom.map(function (number) {
@@ -206,11 +209,18 @@ console.log("amount_payment", amount_payment);
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Hora de Inicio</Label>
-                    <Select onValueChange={setHourStart}>
+                    <Label htmlFor="start_time">
+                        Start Time <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                        value={hourStart}
+                        onValueChange={setHourStart}
+                        disabled={!date || !room}
+                    >
                         <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                             {dataDateStartAvaible.hours_start.map(function (
@@ -225,11 +235,14 @@ console.log("amount_payment", amount_payment);
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Hora Fin</Label>
-                    <Select>
+                    <Label htmlFor="end_time">
+                        End Time <span className="text-red-500">*</span>
+                    </Label>
+                    <Select value={hourEnd} onValueChange={setHourEnd} disabled={!date || !room || !hourStart}  >
                         <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                             {dataDateEndAvaible.hours_end.map(function (hour) {
@@ -242,17 +255,32 @@ console.log("amount_payment", amount_payment);
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Estado de la Reserva</Label>
-                    <Select>
+                    <Label htmlFor="reserv_status">Reserve Status</Label>
+                    <Input
+                        type="text"
+                        id="reserv_status"
+                        placeholder="Customer"
+                        className="bg-white"
+                        defaultValue={status_interfaz_r}
+                        disabled
+                    />
+                </div>
+
+                <div className="grid w-full max-w-sm items-center gap-3">
+                    <Label htmlFor="payment_status">
+                        Payment Status <span className="text-red-500">*</span>
+                    </Label>
+                    <Select onValueChange={setPaymentStatus} value={paymentStatus} >
                         <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                            {status_reserv.map((x) => {
+                            {status_payment.map(x => {
                                 return (
-                                    <SelectItem value={x} key={x}>
-                                        {x[1]}
+                                    <SelectItem value={x[0].toString()} key={x[0].toString()}>
+                                       {x[1]}
                                     </SelectItem>
                                 );
                             })}
@@ -261,43 +289,25 @@ console.log("amount_payment", amount_payment);
                 </div>
 
                 <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Estado del pago</Label>
-                    <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {status_payment.map((x) => {
-                                return (
-                                    <SelectItem value={x[0]} key={x[1]}>
-                                        {x[1]}
-                                    </SelectItem>
-                                );
-                            })}
-                        </SelectContent>
-                    </Select>
+                    <Label htmlFor="payment_amount">Payment Amount</Label>
+                    <Input
+                        value={paymentAmount}
+                        onChange={(e)=>{setPaymentAmount(e.target.value)}}
+                        type="text"
+                        id="payment_amount"
+                        placeholder="Amount"
+                        className="bg-white"
+                        defaultValue={amount_interfaz_p.toString()}
+                        disabled
+                    />
                 </div>
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="texto">Total a Pagar</Label>
-                    <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {amount_payment.map(([id, amount]) => (
-                                <SelectItem value={String(id)} key={id}>
-                                    {amount}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+            </form>
+
             <div className="flex gap-5">
-                <Button className="w-40 bg-orange-600 rounded-sm shadow-md">
+                <Button type="button" className="w-40 bg-orange-600 rounded-sm shadow-md" form="reservAddForm">
                     Cancelar
                 </Button>
-                <Button className="w-40 bg-deep-koamaru-900/90 rounded-sm shadow-md">
+                <Button formAction={formAction} type="button" className="w-40 bg-deep-koamaru-900/90 rounded-sm shadow-md" onClick={createReserv} form="reservAddForm">
                     Guardar Reserva
                 </Button>
             </div>
