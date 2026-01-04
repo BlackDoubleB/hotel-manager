@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\PaymentService;
 use App\Services\HoursService;
 use App\Services\PaymentStatusService;
+use App\Services\ReservationService;
 use App\Services\ReservationStatusService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,9 +18,11 @@ class ReservationController extends Controller
         $data = $rd->RoomNumber();
         $dataStatus = $rs->ReservStatus();
         $dataPaymenStatus = $ps->PaymentStatus();
-        $dataPaymentAmount= $psa->Payment();
-        return Inertia::render('admin/reservationAdd', 
-        ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment'=> $dataPaymenStatus, 'amount_payment'=> $dataPaymentAmount]);
+        $dataPaymentAmount = $psa->Payment();
+        return Inertia::render(
+            'admin/reservationAdd',
+            ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment' => $dataPaymenStatus, 'payment_id' => $dataPaymentAmount]
+        );
     }
     public function Search()
     {
@@ -45,4 +48,28 @@ class ReservationController extends Controller
         ]);
     }
 
+    public function RegisterReservation(Request $rq, ReservationService $rs)
+    {
+        $data = $rq->only([
+            'user_id',
+            'room_id',
+            'payment_id',
+            'payment_status_id',
+            'reservation_status_id',
+            'customer',
+            'reservation_date',
+            'start_time',
+            'end_time',
+        ]);
+
+
+        foreach($data as $d){
+            echo 'esto es la data '. $d. "\n";
+            echo 'esto es el tipo '. gettype($d). "\n";
+            echo "\n";
+        }
+        $res = $rs->registerReservation($data);
+
+        return response()->json($res);
+    }
 }

@@ -65,5 +65,5 @@ export type DataStatusPayment = {
 
 type ItemAmountPayment = [number, number];
 export type DataAmountPayment = {
-    amount_payment: ItemAmountPayment[];
+    payment_id: ItemAmountPayment[];
 };

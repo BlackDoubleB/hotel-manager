@@ -3,7 +3,7 @@
 namespace App\Services;
 use App\Models\ReservationStatus;
 
-Class ReservationStatusService{
+class ReservationStatusService{
     function ReservStatus(){
         $dataStatus = ReservationStatus::All();
         $status = [];

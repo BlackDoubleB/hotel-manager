@@ -14,3 +14,5 @@ Route::get('/dateStartTime', [ReservationController::class, 'availabilitystartho
 Route::get('/dateEndTime', [ReservationController::class, 'availabilityendhours'])->name('reservationCreate')->middleware(['auth']);
 
 Route::get('/reservation/search', [ReservationController::class, 'search'])->name('reservationSearch')->middleware(['auth']);
+
+Route::post('/registerReservation', [ReservationController::class, 'registerreservation'])->name('reservationCreate')->middleware(['auth']);
