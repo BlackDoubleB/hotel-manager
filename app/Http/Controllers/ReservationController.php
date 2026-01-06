@@ -24,9 +24,10 @@ class ReservationController extends Controller
             ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment' => $dataPaymenStatus, 'payment_id' => $dataPaymentAmount]
         );
     }
-    public function Search()
+    public function Search(ReservationService $rs)
     {
-        return Inertia::render('reservationSearch');
+        $data = $rs->searchReservation();
+        return Inertia::render('reservationSearch', ['reservationsData' => $data]);
     }
 
     public function AvailabilityStartHours(Request $rq, HoursService $h)
@@ -62,12 +63,6 @@ class ReservationController extends Controller
             'end_time',
         ]);
 
-
-        foreach($data as $d){
-            echo 'esto es la data '. $d. "\n";
-            echo 'esto es el tipo '. gettype($d). "\n";
-            echo "\n";
-        }
         $res = $rs->registerReservation($data);
 
         return response()->json($res);

@@ -20,26 +20,27 @@ class HoursService
                 $room_hours_busy[] = $hours;
             }
         }
-         foreach ($room_hours_busy as $item) {
-            foreach($item as $i){
-                 Log::info('HORA ' . $i);
-            }
-            Log::info('------');
-           
-}
-
         return $room_hours_busy;
     }
+    public function getNumberSeconds($time)
+    {
+        $hour = intval(substr($time, 0, 2));
+        $minute = intval(substr($time, 3, 2));
+        $seconds = intval(substr($time, 3, 2));
+        //pasando a segundos
+        $h = $hour * 60 * 60;
+        $m = $minute * 60;
+        return $h + $m + $seconds;
+    }
+
     public function DateTimesStartAvailable($room_id, $date)
     {
         date_default_timezone_set('America/Lima');
         $date_mod = substr(str_replace('-', '/', substr($date, 0, 10)), -8);
-        Log::info('date cliente' . $date_mod);
-        Log::info('date sisitema' . date("y/m/d"));
-        $hours = []; //TODAS LAS HORAS DISPONIBLES 
-        $hoursStartBussy = [];
-        $room_time_busy = $this->DateTimesBusy($room_id, $date);
+        $hours = []; 
        
+        $hours_time_busy = $this->DateTimesBusy($room_id, $date);
+
         for ($hour = 0; $hour <= 47; $hour++) {
 
             if ($hour <= 23) {
@@ -48,58 +49,37 @@ class HoursService
                 $hours[] = sprintf("%02d:59:59", $hour - 24);
             }
         }
-        
+
         //si no esta vacio las horas ocupados
-        if (count($room_time_busy)>0) {
-            //recorremos todas las horas ocupadas
+        if (count($hours_time_busy) > 0) {
+            $rangebussy = [];
 
-            foreach ($room_time_busy as $rtb) {
+            foreach ($hours_time_busy as $rtb) {
+                $value_start_bussy = $rtb[0];
+                $value_end_bussy = $rtb[1];
 
-                //obtenemos indice de la hora ocupada de inicio  en el de todas 
-                $index_start = array_search($rtb[0], $hours, true);
-                $index_end = array_search($rtb[1], $hours, true);
-
-                //recorremos desde el indice de inicio y el indice de fin
-                for ($i = $index_start; $i <= $index_end; $i++) {
-                    //tomamos de todas horas las horas de los rangos y las ponemos en las de start
-                    $hoursStartBussy[] = $hours[$i];
+                foreach ($hours as $h) {
+                    if ($this->getNumberSeconds($h) >= $this->getNumberSeconds($value_start_bussy) && $this->getNumberSeconds($h) <= $this->getNumberSeconds($value_end_bussy)) {
+                        $rangebussy[] = $h;
+                    }
                 }
-
-                // $index_start = $rtb[0];
-                // $index_end = $rtb[1];
-                // $toSeconds = fn($t) => strtotime($t) - strtotime('00:00:00');
-                // foreach($hours as $hour){
-                //     if($toSeconds($hour)<$toSeconds($index_start) && $toSeconds($hours)>$toSeconds($index_end)){
-                //         $hoursStartBussy[] =  $hour;
-                //     }
-                // }
-                
             }
-         
-          
-            
-            //devuelve el array con horas que no estan ocupadas
-            $hoursStarAvaible = array_values(array_diff($hours, $hoursStartBussy));
-            $hoursStarAvaibleFilter = array_values(array_filter($hoursStarAvaible, function ($hsa) {
 
-                return substr($hsa, -2) !== '59' && (intval(substr($hsa, 0, 2)) > intval(substr(date("H:i:s"), 0, 2)));
-            }));
-
-            return $hoursStarAvaibleFilter;
+            if ($rangebussy) {
+                $hours = array_diff($hours, $rangebussy);
+            }
         }
-        
+
         if ($date_mod == date("y/m/d")) {
-            Log::info(':)');
             $hours = array_values(array_filter($hours, function ($h) {
                 return substr($h, -2) !== '59' && (intval(substr($h, 0, 2)) > intval(substr(date("H:i:s"), 0, 2)));
             }));
         } else {
-            Log::info(':(');
             $hours = array_values(array_filter($hours, function ($h) {
                 return substr($h, -2) !== '59';
             }));
         }
-        
+
         return $hours;
     }
 

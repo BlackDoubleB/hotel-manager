@@ -177,8 +177,6 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             <div className="border-b border-deep-koamaru-100 pb-5">
                 <h1 className="text-gray-950"> {title[0].label}</h1>
             </div>
-            ESTA DATA
-            {state.message}
             <form
                 id="reservAddForm"
                 className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 "

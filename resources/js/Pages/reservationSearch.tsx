@@ -29,6 +29,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
 type SidebarItem = {
     label: string;
     route: string;
@@ -38,10 +39,27 @@ type SidebarItem = {
 type PageProps = {
     sidebar: SidebarItem[];
 };
-type DataHeader = string[]
-
+type DataHeader = string[];
+type dataReservation = {
+    id: number;
+    payment_status_id: number;
+    payment_id: number;
+    user_id: number;
+    reservation_status_id: number;
+    room_id: 1;
+    customer: string;
+    reservation_date: string;
+    start_time: string;
+    end_time: string;
+    created_at: string;
+    updated_at: string;
+};
+type ReservationProps = {
+    reservationsData: dataReservation[];
+};
 function ReservationSearch() {
     const { sidebar } = usePage<PageProps>().props;
+    const { reservationsData } = usePage<ReservationProps>().props;
     const title = sidebar.filter((item) => item.label === "Search Reservation");
     const dataHeader = [
         "Customer",
@@ -53,6 +71,7 @@ function ReservationSearch() {
         "Reservation Status",
         "Actions",
     ];
+
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
@@ -62,29 +81,7 @@ function ReservationSearch() {
                 New Reservation
             </Button>
             <div className="flex justify-between">
-                <div className="flex items-center gap-2">
-                    <p>Show</p>
-                    <Select>
-                        <SelectTrigger className="w-20">
-                            <SelectValue placeholder="5" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Fruits</SelectLabel>
-                                <SelectItem value="apple">Apple</SelectItem>
-                                <SelectItem value="banana">Banana</SelectItem>
-                                <SelectItem value="blueberry">
-                                    Blueberry
-                                </SelectItem>
-                                <SelectItem value="grapes">Grapes</SelectItem>
-                                <SelectItem value="pineapple">
-                                    Pineapple
-                                </SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                    <p>registers</p>
-                </div>
+               
                 <div className="flex w-fit gap-2">
                     <Input type="text" placeholder="Reservation ID" />
                     <Button type="button" variant="outline">
@@ -97,14 +94,36 @@ function ReservationSearch() {
                 <TableHeader>
                     <TableRow>
                         {dataHeader.map(function (item) {
-                           return  <TableHead className="w-[100px]" key={item}>{item}</TableHead>;
+                            return (
+                                item == 'Actions'? <TableHead className="w-[100px] text-center" key={item}>
+                                    {item}
+                                </TableHead>: <TableHead className="w-[100px]" key={item}>
+                                    {item}
+                                </TableHead>
+                            );
                         })}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow>
-                        <TableCell>INV001</TableCell>
-                    </TableRow>
+                    {reservationsData.map(function (item) {
+                        return (
+                            <TableRow key={item.id}>
+                                <TableCell>{item.customer}</TableCell>
+                                <TableCell>{item.user_id}</TableCell>
+                                <TableCell>{item.reservation_date}</TableCell>
+                                <TableCell>{item.start_time}</TableCell>
+                                <TableCell>{item.end_time}</TableCell>
+                                <TableCell>{item.payment_status_id}</TableCell>
+                                <TableCell>
+                                    {item.reservation_status_id}
+                                </TableCell>
+                                <div className="flex gap-3 justify-center">
+                                    <Button size="sm" className="w-15 bg-deep-koamaru-900/90">View</Button>
+                                    <Button size="sm" className="w-15 bg-orange-600">Edit</Button>
+                                </div>
+                            </TableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
             <Pagination>
