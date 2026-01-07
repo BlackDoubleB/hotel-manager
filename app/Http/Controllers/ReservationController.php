@@ -24,9 +24,9 @@ class ReservationController extends Controller
             ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment' => $dataPaymenStatus, 'payment_id' => $dataPaymentAmount]
         );
     }
-    public function Search(ReservationService $rs)
+    public function Search(ReservationService $rs, Request $rq)
     {
-        $data = $rs->searchReservation();
+        $data = $rs->searchReservation($rq);
         return Inertia::render('reservationSearch', ['reservationsData' => $data]);
     }
 

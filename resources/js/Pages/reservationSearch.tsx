@@ -1,5 +1,5 @@
 import MainLayout from "@/Layouts/MainLayout";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import {
     Table,
     TableBody,
@@ -60,6 +60,9 @@ type ReservationProps = {
 function ReservationSearch() {
     const { sidebar } = usePage<PageProps>().props;
     const { reservationsData } = usePage<ReservationProps>().props;
+    const [nowDataReserv, setNowDataReserv] = useState<ReservationProps>({
+        reservationsData: [],
+    });
     const title = sidebar.filter((item) => item.label === "Search Reservation");
     const dataHeader = [
         "Customer",
@@ -72,6 +75,45 @@ function ReservationSearch() {
         "Actions",
     ];
 
+    function getCookie(name: string) {
+        return document.cookie
+            .split("; ")
+            .find((row) => row.startsWith(name + "="))
+            ?.split("=")[1];
+    }
+
+    // function changePage(page: string) {
+    //     const xsrf = getCookie("XSRF-TOKEN");
+    //     const headers: HeadersInit = {
+    //         "Content-Type": "application/json",
+    //         Accept: "application/json",
+    //     };
+
+    //     if (xsrf) {
+    //         headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrf);
+    //     }
+
+    //     fetch(`/reservation/search?page=${page}`, {
+    //         method: "GET",
+    //         credentials: "same-origin",
+    //         headers,
+    //     }).then(function (response) {
+    //         if (response.ok){
+    //          return response.json();  
+    //         }
+            
+    //     }).then((data)=>{
+    //         const data2 = data;
+    //         debugger
+    //     });
+    // }
+    function changePage(page: string) {
+    router.get(
+        "/reservation/search",
+        { page },
+        { preserveScroll: true, preserveState: true }
+    );
+}
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
@@ -81,7 +123,6 @@ function ReservationSearch() {
                 New Reservation
             </Button>
             <div className="flex justify-between">
-               
                 <div className="flex w-fit gap-2">
                     <Input type="text" placeholder="Reservation ID" />
                     <Button type="button" variant="outline">
@@ -94,10 +135,15 @@ function ReservationSearch() {
                 <TableHeader>
                     <TableRow>
                         {dataHeader.map(function (item) {
-                            return (
-                                item == 'Actions'? <TableHead className="w-[100px] text-center" key={item}>
+                            return item == "Actions" ? (
+                                <TableHead
+                                    className="w-[100px] text-center"
+                                    key={item}
+                                >
                                     {item}
-                                </TableHead>: <TableHead className="w-[100px]" key={item}>
+                                </TableHead>
+                            ) : (
+                                <TableHead className="w-[100px]" key={item}>
                                     {item}
                                 </TableHead>
                             );
@@ -118,8 +164,18 @@ function ReservationSearch() {
                                     {item.reservation_status_id}
                                 </TableCell>
                                 <div className="flex gap-3 justify-center">
-                                    <Button size="sm" className="w-15 bg-deep-koamaru-900/90">View</Button>
-                                    <Button size="sm" className="w-15 bg-orange-600">Edit</Button>
+                                    <Button
+                                        size="sm"
+                                        className="w-15 bg-deep-koamaru-900/90"
+                                    >
+                                        View
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        className="w-15 bg-orange-600"
+                                    >
+                                        Edit
+                                    </Button>
                                 </div>
                             </TableRow>
                         );
@@ -129,24 +185,16 @@ function ReservationSearch() {
             <Pagination>
                 <PaginationContent>
                     <PaginationItem>
-                        <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#" isActive>
+                        <PaginationLink
+                            href="#"
+                            isActive
+                            onClick={(e) => {
+                                e.preventDefault();
+                                changePage("2")
+                            }}
+                        >
                             2
                         </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext href="#" />
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>

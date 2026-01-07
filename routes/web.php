@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
 
 Route::get('/', function () {
-    // return Inertia::render('user/show'); 
+    return redirect('/reservation/create');
 });
 
 Route::get('/reservation/create', [ReservationController::class, 'add'])->name('reservationCreate')->middleware(['auth']);

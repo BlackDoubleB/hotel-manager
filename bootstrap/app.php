@@ -18,12 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->web(append: [
         HandleInertiaRequests::class,//AGREGARLO al grupo web (HandleInertiaRequests)
     ]);
+    $middleware->redirectGuestsTo('/login');
+    $middleware->redirectUsersTo('/reservation/create');
+
     // 2. Configurar ALIAS para middlewares específicos
     // $middleware->alias([
     //     'admin' => CheckAdmin::class,
     //     'subscription' => CheckSubscription::class,
     // ]);
     })
+    
     // CONFIGURA MANEJO DE EXCEPCIONES
     ->withExceptions(function (Exceptions $exceptions): void {
         //
