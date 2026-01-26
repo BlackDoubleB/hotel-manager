@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\PaymentService;
@@ -29,6 +29,12 @@ class ReservationController extends Controller
         $data = $rs->searchReservation($rq);
         return Inertia::render('reservationSearch', ['reservationsData' => $data]);
     }
+    public function SearchId(ReservationService $rs, $id)
+    {
+        $data = $rs->searchReservationId($id);
+        return response()->json( ['reservationDataId' => $data]);
+    }
+
 
     public function AvailabilityStartHours(Request $rq, HoursService $h)
     {

@@ -13,27 +13,26 @@ type SidebarProps = {
 };
 
 export type AuthUser = {
-  id: number;
-  name: string;
-  email: string;
+    id: number;
+    name: string;
+    email: string;
 };
 
-type AmountItem ={
-  price : number
-}
+type AmountItem = {
+    price: number;
+};
 
 export type AmountProps = {
-  amount : AmountItem[]; 
-}
+    amount: AmountItem[];
+};
 
 export type AuthProps = {
-  user: AuthUser | null;
+    user: AuthUser | null;
 };
 
 export type PageProps = SidebarProps & {
-  auth: AuthProps;
+    auth: AuthProps;
 };
-
 
 // SD
 type Room = {
@@ -66,4 +65,41 @@ export type DataStatusPayment = {
 type ItemAmountPayment = [number, number];
 export type DataAmountPayment = {
     payment_id: ItemAmountPayment[];
+};
+
+export type PagePropsAuth = {
+    sidebar: SidebarItem[];
+};
+
+export type dataReservation = {
+    id: number;
+    user_id: number;
+    payment_id: number;
+    payment_status_id: number;
+    reservation_status_id: number;
+    room_id: number;
+    customer: string;
+    reservation_date: string;
+    start_time: string;
+    end_time: string;
+    user_name: string;
+    payment_amount: number;
+    payment_status: string;
+    reservation_status: string;
+    room_number: number;
+};
+export type ReservationProps = {
+    reservationsData: {
+        data: dataReservation[];
+        last_page: number;
+        current_page: number;
+    };
+};
+export type ReservationPropsSearchId = {
+    reservationDataId: dataReservation[];
+};
+
+export type reservationColumnsHeader = {
+    key: string;
+    label: string;
 };

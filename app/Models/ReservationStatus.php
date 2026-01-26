@@ -12,4 +12,9 @@ class ReservationStatus extends Model
      * @var string
      */
     protected $table = 'reservation_status';
+
+    public function reservation(){
+        return $this->hasMany(Reservation::class);
+    }
+    
 }

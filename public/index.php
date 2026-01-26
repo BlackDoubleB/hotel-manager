@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
 // Register the Composer autoloader...
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Bootstrap Laravel and handle the request...
 /** @var Application $app */
@@ -22,7 +22,7 @@ require __DIR__.'/../vendor/autoload.php';
 // PASO 2 
 // Se ejecuta las lineas anteriores
 // Cuando llega a esta línea:
-$app = require_once __DIR__.'/../bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 // require_once: Carga el archivo bootstrap/app.php una sola vez (si ya está cargado, no lo vuelve a cargar)
 // bootstrap/app.php: El "corazón" de Laravel 12. 
@@ -75,6 +75,9 @@ $app->handleRequest(Request::capture());
 //    → $response = $kernel->handle($request)
 //    ↓
 // 6. Kernel::handle()
+// ✅ “El coordinador principal de las peticiones (requests)”
+// ✅ El encargado de pasar el request por los middleware
+// ✅ Y llevarlo hasta la ruta correcta
 //    → $this->sendRequestThroughRouter($request)
 //    ↓
 // 7. sendRequestThroughRouter()

@@ -1,119 +1,111 @@
 import MainLayout from "@/Layouts/MainLayout";
 import { router, usePage } from "@inertiajs/react";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
-type SidebarItem = {
-    label: string;
-    route: string;
-    icon: string;
-    roles: string[];
-};
-type PageProps = {
-    sidebar: SidebarItem[];
-};
-type DataHeader = string[];
-type dataReservation = {
-    id: number;
-    payment_status_id: number;
-    payment_id: number;
-    user_id: number;
-    reservation_status_id: number;
-    room_id: 1;
-    customer: string;
-    reservation_date: string;
-    start_time: string;
-    end_time: string;
-    created_at: string;
-    updated_at: string;
-};
-type ReservationProps = {
-    reservationsData: dataReservation[];
-};
-function ReservationSearch() {
-    const { sidebar } = usePage<PageProps>().props;
-    const { reservationsData } = usePage<ReservationProps>().props;
-    const [nowDataReserv, setNowDataReserv] = useState<ReservationProps>({
-        reservationsData: [],
-    });
-    const title = sidebar.filter((item) => item.label === "Search Reservation");
-    const dataHeader = [
-        "Customer",
-        "Admin",
-        "Date",
-        "Start Time",
-        "End Time",
-        "Payment Status",
-        "Reservation Status",
-        "Actions",
-    ];
+import { useCallback, useMemo, useState } from "react";
+import SearchTable from "@/components/reservations/search/table";
+import { dataReservation, PagePropsAuth, ReservationProps } from "@/types";
+import PaginationButton from "@/components/reservations/search/buttonPagination";
+import ModalView from "@/components/reservations/search/modalView";
 
-    function getCookie(name: string) {
-        return document.cookie
-            .split("; ")
-            .find((row) => row.startsWith(name + "="))
-            ?.split("=")[1];
+function ReservationSearch() {
+    const { sidebar } = usePage<PagePropsAuth>().props;
+    const { reservationsData } = usePage<ReservationProps>().props;
+    const title = sidebar.filter((item) => item.label === "Search Reservation");
+    const reservationColumns = [
+        { key: "customer", label: "Customer" },
+        { key: "admin", label: "Admin" },
+        { key: "date", label: "Date" },
+        { key: "startTime", label: "Start Time" },
+        { key: "endTime", label: "End Time" },
+        { key: "paymentStatus", label: "Payment Status" },
+        { key: "reservationStatus", label: "Reservation Status" },
+        { key: "actions", label: "Actions" },
+    ];
+    const pages: number[] = useMemo(() => {
+        const result: number[] = [];
+        for (let i = 1; i <= reservationsData.last_page; i++) {
+            result.push(i);
+        }
+        return result;
+    }, [reservationsData.last_page]);
+
+    const [pagesInterfaz, setPagesInterfaz] = useState<number[]>(
+        pages.slice(0),
+    );
+    const [valueFilter, setValueFilter] = useState<string>("");
+    //     id: 0,
+    //     user_id: 0,
+    //     payment_id: 0,
+    //     payment_status_id: 0,
+    //     reservation_status_id: 0,
+    //     room_id: 0,
+    //     customer: "",
+    //     reservation_date: "",
+    //     start_time: "",
+    //     end_time: "",
+    //     user_name: "",
+    //     payment_amount: 0,
+    //     payment_status: "",
+    //     reservation_status: "",
+    //     room_number: 0,
+    // };
+    const [dataReservationId, setDataReservationId] = useState<
+        dataReservation | undefined
+    >(undefined);
+    const [openView, setOpenView] = useState(false);
+
+    function changePage(page: number) {
+        router.get(
+            "/reservation/search",
+            {
+                ...(valueFilter ? { reservation_status: valueFilter } : {}),
+                page,
+            },
+            { preserveScroll: true, preserveState: true },
+        );
+
+        if (page == 1) {
+            setPagesInterfaz(pages.slice(page - 1));
+        } else if (page == 2) {
+            setPagesInterfaz(pages.slice(page - 2));
+        } else if (page == 3 && page == reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 3, page + 2));
+        } else if (page < reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 2, page + 3));
+        } else if (page == reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 3, page));
+        }
     }
 
-    // function changePage(page: string) {
-    //     const xsrf = getCookie("XSRF-TOKEN");
-    //     const headers: HeadersInit = {
-    //         "Content-Type": "application/json",
-    //         Accept: "application/json",
-    //     };
+    function filterPage() {
+        const status_reserv = valueFilter.trim();
 
-    //     if (xsrf) {
-    //         headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrf);
-    //     }
+        if (!status_reserv) return;
 
-    //     fetch(`/reservation/search?page=${page}`, {
-    //         method: "GET",
-    //         credentials: "same-origin",
-    //         headers,
-    //     }).then(function (response) {
-    //         if (response.ok){
-    //          return response.json();  
-    //         }
-            
-    //     }).then((data)=>{
-    //         const data2 = data;
-    //         debugger
-    //     });
-    // }
-    function changePage(page: string) {
-    router.get(
-        "/reservation/search",
-        { page },
-        { preserveScroll: true, preserveState: true }
-    );
-}
+        const convertMin = status_reserv.toLocaleLowerCase();
+        setPagesInterfaz([...pages]);
+        router.get(
+            "/reservation/search",
+            { reservation_status: convertMin },
+            { preserveScroll: true, preserveState: true },
+        );
+    }
+
+    const viewReserv = useCallback(async function ViewReserv(id: number) {
+        const res = await fetch(`/reservation/search/${id}`, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+        });
+
+        if (!res.ok) throw new Error("Error en la respuesta");
+        const valor = await res.json();
+        setDataReservationId(valor.reservationDataId[0]);
+        setOpenView(true);
+    }, []);
+
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
@@ -124,80 +116,37 @@ function ReservationSearch() {
             </Button>
             <div className="flex justify-between">
                 <div className="flex w-fit gap-2">
-                    <Input type="text" placeholder="Reservation ID" />
-                    <Button type="button" variant="outline">
+                    <Input
+                        type="text"
+                        placeholder="Reservation ID"
+                        value={valueFilter}
+                        onChange={(e) => setValueFilter(e.target.value)}
+                    />
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => filterPage()}
+                    >
                         Search
                     </Button>
                 </div>
             </div>
-            <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        {dataHeader.map(function (item) {
-                            return item == "Actions" ? (
-                                <TableHead
-                                    className="w-[100px] text-center"
-                                    key={item}
-                                >
-                                    {item}
-                                </TableHead>
-                            ) : (
-                                <TableHead className="w-[100px]" key={item}>
-                                    {item}
-                                </TableHead>
-                            );
-                        })}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {reservationsData.map(function (item) {
-                        return (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.customer}</TableCell>
-                                <TableCell>{item.user_id}</TableCell>
-                                <TableCell>{item.reservation_date}</TableCell>
-                                <TableCell>{item.start_time}</TableCell>
-                                <TableCell>{item.end_time}</TableCell>
-                                <TableCell>{item.payment_status_id}</TableCell>
-                                <TableCell>
-                                    {item.reservation_status_id}
-                                </TableCell>
-                                <div className="flex gap-3 justify-center">
-                                    <Button
-                                        size="sm"
-                                        className="w-15 bg-deep-koamaru-900/90"
-                                    >
-                                        View
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="w-15 bg-orange-600"
-                                    >
-                                        Edit
-                                    </Button>
-                                </div>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-            <Pagination>
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationLink
-                            href="#"
-                            isActive
-                            onClick={(e) => {
-                                e.preventDefault();
-                                changePage("2")
-                            }}
-                        >
-                            2
-                        </PaginationLink>
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
+
+            <SearchTable
+                dataHeader={reservationColumns}
+                reservationsData={reservationsData}
+                viewReserv={viewReserv}
+            />
+            <PaginationButton
+                pagesInterfaz={pagesInterfaz}
+                reservationsData={reservationsData}
+                changePage={changePage}
+            />
+            <ModalView
+                dataReservationId={dataReservationId}
+                openView={openView}
+                setOpenView={setOpenView}
+            />
         </div>
     );
 }
