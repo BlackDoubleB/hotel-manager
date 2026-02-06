@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { reservationColumnsHeader, ReservationProps } from "@/types";
 import clsx from "clsx";
+import { memo } from "react";
 
 type SearchTableProps = {
     dataHeader: reservationColumnsHeader[];
@@ -17,12 +18,11 @@ type SearchTableProps = {
     viewReserv: (id: number) => void;
 };
 
-export default function SearchTable({
+const SearchTable = memo(function SearchTable({
     dataHeader,
     reservationsData,
     viewReserv,
 }: SearchTableProps) {
-    debugger;
     return (
         <>
             <Table>
@@ -65,13 +65,13 @@ export default function SearchTable({
                                     >
                                         View
                                     </Button>
-                                    {/* <Button
+                                    <Button
                                         onClick={() => EditReserv(item.id)}
                                         size="sm"
                                         className="w-15 bg-orange-600"
                                     >
                                         Edit
-                                    </Button> */}
+                                    </Button>
                                 </div>
                             </TableRow>
                         );
@@ -81,3 +81,6 @@ export default function SearchTable({
         </>
     );
 }
+) 
+
+export default SearchTable;

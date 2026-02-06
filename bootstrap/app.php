@@ -5,6 +5,18 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\HandleInertiaRequests;
 
+// La peticion llega del cliente
+// Lo toma el servidor apache y lo pasa a Index.html
+// Index.html llama al archivo app.php (El cual incluye algunas modificaciones de middleware) y retorna la Application configurada.
+// Llama al metodo handleRequest y le pasa la clase Request quqe llego del navegador luego el handleRequest procesa  y hace lo siguiente:
+    // -obtiene el HTTP Kernel
+    // -pasa el request por:
+    // -middlewares
+    // -router
+    // -controller
+    // -obtiene una Response
+    // -la envía al navegador y hace limpieza/terminación
+
 return Application::configure(basePath: dirname(__DIR__))
     // CONFIGURA RUTAS (NO solo los archivos)
     ->withRouting(
@@ -27,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
     //     'subscription' => CheckSubscription::class,
     // ]);
     })
-    
+
     // CONFIGURA MANEJO DE EXCEPCIONES
     ->withExceptions(function (Exceptions $exceptions): void {
         //
@@ -38,16 +50,16 @@ return Application::configure(basePath: dirname(__DIR__))
 // {
 //     // 1. Crea la instancia de Application
 //     $app = new Application($this->basePath);
-    
+
 //     // 2. Configura TODO lo que definiste
 //     $this->configure($app);
-    
+
 //     // 3. ¡Registra handleRequest COMO SINGLETON!
 //     $app->singleton(
 //         \Illuminate\Contracts\Http\Kernel::class,
 //         \Illuminate\Foundation\Http\Kernel::class
 //     );
-    
+
 //     // 4. Retorna la aplicación CONFIGURADA
 //     return $app;
 // }
@@ -59,7 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
 // class Application extends Container implements ApplicationContract
 // {
 //     // ... muchas propiedades y métodos ...
-    
+
 //     /**
 //      * Handle the incoming HTTP request.
 //      */
@@ -67,16 +79,16 @@ return Application::configure(basePath: dirname(__DIR__))
 //     {
 //     // 1. Guarda request en contenedor
 //     $this->instance('request', $request);
-    
+
 //     // 2. OBTIENE Kernel del contenedor (ya está registrado)
 //     $kernel = $this->make(\Illuminate\Contracts\Http\Kernel::class);
-    
+
 //     // 3. ¡PASA request al Kernel para que lo PROCESE!
 //     $response = $kernel->handle($request);
-    
+
 //     // 4. Terminación
 //     $this->terminateRequest($request, $response);
-    
+
 //     // 5. Retorna response
 //     return $response;
 //     }
@@ -88,12 +100,12 @@ return Application::configure(basePath: dirname(__DIR__))
 // {
 //     // 1. Bootstrapping (inicia proveedores)
 //     $this->bootstrap();
-    
+
 //     // 2. ENVIA request a través del ROUTER (¡CON RUTAS!)
 //     $response = $this->sendRequestThroughRouter($request);
 //     //                      ↑
 //     // ¡ESTE MÉTODO SÍ PROCESA LAS RUTAS!
-    
+
 //     return $response;
 // }
 
@@ -103,7 +115,7 @@ return Application::configure(basePath: dirname(__DIR__))
 // {
 //     // 1. Pone request en contenedor
 //     $this->app->instance('request', $request);
-    
+
 //     // 2. Ejecuta middlewares GLOBALES
 //     // 3. ¡LLAMA AL ROUTER QUE USA TUS RUTAS!
 //     return (new Pipeline($this->app))
@@ -112,7 +124,7 @@ return Application::configure(basePath: dirname(__DIR__))
 //         ->then(function ($request) {
 //             // ¡AQUÍ FINALMENTE USA EL ROUTER CON TUS RUTAS!
 //             $this->app->instance('request', $request);
-            
+
 //             return $this->router->dispatch($request);
 //             // ↑ Router busca en routes/web.php
 //             // ↑ Encuentra ruta → Ejecuta middlewares de ruta → Controller
@@ -125,11 +137,11 @@ return Application::configure(basePath: dirname(__DIR__))
 // {
 //     // 1. Encuentra la ruta en routes/web.php
 //     $route = $this->findRoute($request);
-    
+
 //     // 2. Ejecuta middlewares de ESA RUTA (auth, etc.)
 //     // 3. Ejecuta el Controller
 //     $response = $this->runRoute($request, $route);
-    
+
 //     return $response;
 //     // Este response viene del Controller:
 //     // return Inertia::render(...) o response()->json(...)
@@ -141,7 +153,7 @@ return Application::configure(basePath: dirname(__DIR__))
 // {
 //     // Tu lógica aquí
 //     $data = User::all();
-    
+
 //     // Para Inertia:
 //     return Inertia::render('Dashboard', ['users' => $data]);
 //     // O para API:
@@ -173,7 +185,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
 // En Laravel 12 hay DOS formas de configurar middlewares y se ven similares. Vamos a aclararlo:
 // ¡SON DOS COSAS DIFERENTES!
-// 1. $middleware->web() - MIDDLEWARES GLOBALES PARA RUTAS WEB    
+// 1. $middleware->web() - MIDDLEWARES GLOBALES PARA RUTAS WEB
 // // bootstrap/app.php
 // ->withMiddleware(function ($middleware) {
 //     // Estos son "globales" para CADA TIPO de ruta
@@ -198,7 +210,7 @@ return Application::configure(basePath: dirname(__DIR__))
 // Route::delete('/api/posts/{id}', ...); // ← JavaScript borra recurso
 
 // 2. $middleware->alias() - DEFINIR ALIAS PARA USAR EN RUTAS
-// // bootstrap/app.php  
+// // bootstrap/app.php
 // $middleware->alias([
 //         'auth' => \App\Http\Middleware\Authenticate::class,
 //         'admin' => \App\Middleware\CheckAdmin::class,
@@ -212,7 +224,7 @@ return Application::configure(basePath: dirname(__DIR__))
 // Grupo 'web' por DEFECTO (invisible):
 // [
 //     \Illuminate\Session\Middleware\StartSession::class,
-//     \Illuminate\View\Middleware\ShareErrorsFromSession::class, 
+//     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
 //     \App\Http\Middleware\VerifyCsrfToken::class,
 //     // ... más
 // ]
@@ -239,17 +251,17 @@ return Application::configure(basePath: dirname(__DIR__))
 //     ->withMiddleware(function (Http\Middleware $middleware) {
 //         // PARTE A: Middlewares GLOBALES para grupos
 //         // Se aplican AUTOMÁTICAMENTE a TODAS las rutas del grupo
-        
+
 //         // Para TODAS las rutas en routes/web.php
 //         $middleware->web(append: [
 //             \App\Middleware\HandleInertiaRequests::class, // ← GLOBAL WEB
 //         ]);
-        
-//         // Para TODAS las rutas en routes/api.php  
+
+//         // Para TODAS las rutas en routes/api.php
 //         $middleware->api(prepend: [
 //             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
 //         ]);
-        
+
 //         // PARTE B: Definir ALIAS para usar en rutas específicas
 //         // NO se aplican automáticamente
 //         $middleware->alias([
@@ -269,7 +281,7 @@ return Application::configure(basePath: dirname(__DIR__))
 //     // ↑ Usa los ALIAS definidos en app.php
 //     // ↑ Estos SOLO se aplican a /admin
 
-// // RUTA 2: Sin middlewares específicos  
+// // RUTA 2: Sin middlewares específicos
 // Route::get('/public', [HomeController::class, 'index']);
 // // ↑ SOLO ejecuta los GLOBALES de $middleware->web()
 // // ↑ NO ejecuta 'auth', 'admin', 'verified'

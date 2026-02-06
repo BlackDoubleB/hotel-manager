@@ -106,6 +106,21 @@ function ReservationSearch() {
         setOpenView(true);
     }, []);
 
+    const editReserv = useCallback(async function EditReserv(id: number) {
+        const res = await fetch(`/reservation/edit/${id}`, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+        });
+
+        if (!res.ok) throw new Error("Error en la respuesta");
+        const valor = await res.json();
+        setDataReservationId(valor.reservationDataId[0]);
+        setOpenView(true);
+    }, []);
+
+    
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">

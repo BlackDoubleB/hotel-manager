@@ -13,7 +13,7 @@ use App\Services\RoomData;
 
 class ReservationController extends Controller
 {
-    public function Add(RoomData $rd, ReservationStatusService $rs, PaymentStatusService $ps, PaymentService $psa)
+    public function add(RoomData $rd, ReservationStatusService $rs, PaymentStatusService $ps, PaymentService $psa)
     {
         $data = $rd->RoomNumber();
         $dataStatus = $rs->ReservStatus();
@@ -24,19 +24,19 @@ class ReservationController extends Controller
             ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment' => $dataPaymenStatus, 'payment_id' => $dataPaymentAmount]
         );
     }
-    public function Search(ReservationService $rs, Request $rq)
+    public function search(ReservationService $rs, Request $rq)
     {
         $data = $rs->searchReservation($rq);
         return Inertia::render('reservationSearch', ['reservationsData' => $data]);
     }
-    public function SearchId(ReservationService $rs, $id)
+    public function searchId(ReservationService $rs, $id)
     {
         $data = $rs->searchReservationId($id);
-        return response()->json( ['reservationDataId' => $data]);
+        return response()->json(['reservationDataId' => $data]);
     }
 
 
-    public function AvailabilityStartHours(Request $rq, HoursService $h)
+    public function availabilityStartHours(Request $rq, HoursService $h)
     {
         $roomId = (int) $rq->query('room');
         $dateTime = $rq->query('date');
@@ -45,9 +45,9 @@ class ReservationController extends Controller
             'hours_start' => $hoursAvailability
         ]);
     }
-    public function AvailabilityEndHours(Request $rq, HoursService $h)
+    public function availabilityEndHours(Request $rq, HoursService $h)
     {
-        $listHours =  $rq->query('listHoursStart');
+        $listHours = $rq->query('listHoursStart');
         $dateStart = $rq->query('hourStartSelected');
         $hoursAvailability = $h->DateTimesEndAvaible($listHours, $dateStart);
         return response()->json([
@@ -55,7 +55,7 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function RegisterReservation(Request $rq, ReservationService $rs)
+    public function registerReservation(Request $rq, ReservationService $rs)
     {
         $data = $rq->only([
             'user_id',
