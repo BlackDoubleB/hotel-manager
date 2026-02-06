@@ -92,6 +92,7 @@ function ReservationSearch() {
         );
     }
 
+
     const viewReserv = useCallback(async function ViewReserv(id: number) {
         const res = await fetch(`/reservation/search/${id}`, {
             method: "GET",
@@ -150,7 +151,7 @@ function ReservationSearch() {
             <SearchTable
                 dataHeader={reservationColumns}
                 reservationsData={reservationsData}
-                viewReserv={viewReserv}
+                viewReserv={viewReserv} editReserv={editReserv}
             />
             <PaginationButton
                 pagesInterfaz={pagesInterfaz}

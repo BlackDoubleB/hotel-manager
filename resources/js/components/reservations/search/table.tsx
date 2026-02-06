@@ -16,12 +16,13 @@ type SearchTableProps = {
     dataHeader: reservationColumnsHeader[];
     reservationsData: ReservationProps["reservationsData"];
     viewReserv: (id: number) => void;
+    editReserv: (id: number) => void;
 };
 
 const SearchTable = memo(function SearchTable({
     dataHeader,
     reservationsData,
-    viewReserv,
+    viewReserv,editReserv
 }: SearchTableProps) {
     return (
         <>
@@ -66,7 +67,7 @@ const SearchTable = memo(function SearchTable({
                                         View
                                     </Button>
                                     <Button
-                                        onClick={() => EditReserv(item.id)}
+                                        onClick={() => editReserv(item.id)}
                                         size="sm"
                                         className="w-15 bg-orange-600"
                                     >
