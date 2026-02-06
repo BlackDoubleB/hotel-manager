@@ -23,6 +23,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // register() es el lugar oficial para registrar bindings en el contenedor de dependencias.
+        // Cuando alguien pida LogoutResponse::class, entrega ESTE objeto que yo construí.”
         $this->app->instance(LogoutResponse::class, new class implements LogoutResponse {
             public function toResponse($request)
             {
@@ -36,6 +38,15 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // boot() normalmente se usa para CONFIGURAR servicios ya cargados.
+        
+        // ¿Entonces Fortify cómo usa esas clases si tú no las registraste con $this->app?
+        // Porque Fortify por dentro ya está preparado para resolverlas desde el contenedor.
+        // Y normalmente esas clases (por ejemplo CreateNewUser) implementan interfaces/contratos de Fortify, algo como:
+        // Laravel\Fortify\Contracts\CreatesNewUsers
+        // UpdatesUserProfileInformation
+        // etc.
+        // 📌 O sea: la “firma” existe, pero está en esas clases, no en el provider.
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

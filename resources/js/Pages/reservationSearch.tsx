@@ -1,58 +1,126 @@
 import MainLayout from "@/Layouts/MainLayout";
-import { usePage } from "@inertiajs/react";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import { router, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-type SidebarItem = {
-    label: string;
-    route: string;
-    icon: string;
-    roles: string[];
-};
-type PageProps = {
-    sidebar: SidebarItem[];
-};
-type DataHeader = string[]
+import { useCallback, useMemo, useState } from "react";
+import SearchTable from "@/components/reservations/search/table";
+import { dataReservation, PagePropsAuth, ReservationProps } from "@/types";
+import PaginationButton from "@/components/reservations/search/buttonPagination";
+import ModalView from "@/components/reservations/search/modalView";
 
 function ReservationSearch() {
-    const { sidebar } = usePage<PageProps>().props;
+    const { sidebar } = usePage<PagePropsAuth>().props;
+    const { reservationsData } = usePage<ReservationProps>().props;
     const title = sidebar.filter((item) => item.label === "Search Reservation");
-    const dataHeader = [
-        "Customer",
-        "Admin",
-        "Date",
-        "Start Time",
-        "End Time",
-        "Payment Status",
-        "Reservation Status",
-        "Actions",
+    const reservationColumns = [
+        { key: "customer", label: "Customer" },
+        { key: "admin", label: "Admin" },
+        { key: "date", label: "Date" },
+        { key: "startTime", label: "Start Time" },
+        { key: "endTime", label: "End Time" },
+        { key: "paymentStatus", label: "Payment Status" },
+        { key: "reservationStatus", label: "Reservation Status" },
+        { key: "actions", label: "Actions" },
     ];
+    const pages: number[] = useMemo(() => {
+        const result: number[] = [];
+        for (let i = 1; i <= reservationsData.last_page; i++) {
+            result.push(i);
+        }
+        return result;
+    }, [reservationsData.last_page]);
+
+    const [pagesInterfaz, setPagesInterfaz] = useState<number[]>(
+        pages.slice(0),
+    );
+    const [valueFilter, setValueFilter] = useState<string>("");
+    //     id: 0,
+    //     user_id: 0,
+    //     payment_id: 0,
+    //     payment_status_id: 0,
+    //     reservation_status_id: 0,
+    //     room_id: 0,
+    //     customer: "",
+    //     reservation_date: "",
+    //     start_time: "",
+    //     end_time: "",
+    //     user_name: "",
+    //     payment_amount: 0,
+    //     payment_status: "",
+    //     reservation_status: "",
+    //     room_number: 0,
+    // };
+    const [dataReservationId, setDataReservationId] = useState<
+        dataReservation | undefined
+    >(undefined);
+    const [openView, setOpenView] = useState(false);
+
+    function changePage(page: number) {
+        router.get(
+            "/reservation/search",
+            {
+                ...(valueFilter ? { reservation_status: valueFilter } : {}),
+                page,
+            },
+            { preserveScroll: true, preserveState: true },
+        );
+
+        if (page == 1) {
+            setPagesInterfaz(pages.slice(page - 1));
+        } else if (page == 2) {
+            setPagesInterfaz(pages.slice(page - 2));
+        } else if (page == 3 && page == reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 3, page + 2));
+        } else if (page < reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 2, page + 3));
+        } else if (page == reservationsData.last_page) {
+            setPagesInterfaz(pages.slice(page - 3, page));
+        }
+    }
+
+    function filterPage() {
+        const status_reserv = valueFilter.trim();
+
+        if (!status_reserv) return;
+
+        const convertMin = status_reserv.toLocaleLowerCase();
+        setPagesInterfaz([...pages]);
+        router.get(
+            "/reservation/search",
+            { reservation_status: convertMin },
+            { preserveScroll: true, preserveState: true },
+        );
+    }
+
+    const viewReserv = useCallback(async function ViewReserv(id: number) {
+        const res = await fetch(`/reservation/search/${id}`, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+        });
+
+        if (!res.ok) throw new Error("Error en la respuesta");
+        const valor = await res.json();
+        setDataReservationId(valor.reservationDataId[0]);
+        setOpenView(true);
+    }, []);
+
+    const editReserv = useCallback(async function EditReserv(id: number) {
+        const res = await fetch(`/reservation/edit/${id}`, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+        });
+
+        if (!res.ok) throw new Error("Error en la respuesta");
+        const valor = await res.json();
+        setDataReservationId(valor.reservationDataId[0]);
+        setOpenView(true);
+    }, []);
+
+    
     return (
         <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
             <div className="border-b border-deep-koamaru-100 pb-5">
@@ -62,75 +130,38 @@ function ReservationSearch() {
                 New Reservation
             </Button>
             <div className="flex justify-between">
-                <div className="flex items-center gap-2">
-                    <p>Show</p>
-                    <Select>
-                        <SelectTrigger className="w-20">
-                            <SelectValue placeholder="5" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Fruits</SelectLabel>
-                                <SelectItem value="apple">Apple</SelectItem>
-                                <SelectItem value="banana">Banana</SelectItem>
-                                <SelectItem value="blueberry">
-                                    Blueberry
-                                </SelectItem>
-                                <SelectItem value="grapes">Grapes</SelectItem>
-                                <SelectItem value="pineapple">
-                                    Pineapple
-                                </SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                    <p>registers</p>
-                </div>
                 <div className="flex w-fit gap-2">
-                    <Input type="text" placeholder="Reservation ID" />
-                    <Button type="button" variant="outline">
+                    <Input
+                        type="text"
+                        placeholder="Reservation ID"
+                        value={valueFilter}
+                        onChange={(e) => setValueFilter(e.target.value)}
+                    />
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => filterPage()}
+                    >
                         Search
                     </Button>
                 </div>
             </div>
-            <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        {dataHeader.map(function (item) {
-                           return  <TableHead className="w-[100px]" key={item}>{item}</TableHead>;
-                        })}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow>
-                        <TableCell>INV001</TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-            <Pagination>
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#" isActive>
-                            2
-                        </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext href="#" />
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
+
+            <SearchTable
+                dataHeader={reservationColumns}
+                reservationsData={reservationsData}
+                viewReserv={viewReserv}
+            />
+            <PaginationButton
+                pagesInterfaz={pagesInterfaz}
+                reservationsData={reservationsData}
+                changePage={changePage}
+            />
+            <ModalView
+                dataReservationId={dataReservationId}
+                openView={openView}
+                setOpenView={setOpenView}
+            />
         </div>
     );
 }
