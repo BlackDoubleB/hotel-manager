@@ -18,10 +18,12 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { SidebarProps, PageProps } from "@/types";
 import { usePage, Link, router } from "@inertiajs/react";
 import { Button } from "./ui/button";
+import { useState } from "react";
 
 const iconMap: Record<string, LucideIcon> = {
     calendar: Calendar,
@@ -33,25 +35,33 @@ const iconMap: Record<string, LucideIcon> = {
 export function AppSidebar() {
     const { sidebar } = usePage<SidebarProps>().props;
     const { auth } = usePage<PageProps>().props;
+    const [open, setOpen] = useState(true);
 
     return (
         <Sidebar variant="inset" collapsible="icon" className="p-0">
-            <SidebarContent className="bg-deep-koamaru-900/90 text-deep-koamaru-50">
+            <SidebarContent className="bg-zinc-950 text-zinc-300 border-r border-zinc-800">
                 <SidebarGroup className="h-full grid grid-rows-[auto_auto_1fr] ">
-                    <SidebarGroupLabel className="font-bold text-deep-koamaru-50">
+                    <SidebarGroupLabel className="font-bold text-zinc-100 text-lg py-4">
                         Hotel Manager
+                        {open && <SidebarTrigger className="absolute flex items-center justify-center right-5 cursor-pointer" onClick={() => setOpen(false)} />}
                     </SidebarGroupLabel>
-                    <SidebarGroupLabel className="font-bold text-deep-koamaru-50">
+
+
+
+                    <SidebarGroupLabel className="font-medium text-zinc-400 mb-6">
                         Welcome: {auth.user?.name}
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
+                            {!open && <SidebarTrigger className="px-4 cursor-pointer"  onClick={() => setOpen(true)}/>}
                             {sidebar.map((item) => {
                                 const Icon = iconMap[item.icon] ?? Home;
 
                                 return (
                                     <SidebarMenuItem key={item.label}>
+
                                         <SidebarMenuButton asChild>
+
                                             <Link href={item.route}>
                                                 <Icon className="w-4 h-4" />
                                                 <span>{item.label}</span>
@@ -69,7 +79,7 @@ export function AppSidebar() {
                         variant="outline"
                         size="icon"
                         aria-label="Submit"
-                        className="bg-gray-800 w-full self-end cursor-pointer"
+                        className="text-zinc-800  w-full self-end cursor-pointer"
                     >
                         Logout
                         <LogIn />

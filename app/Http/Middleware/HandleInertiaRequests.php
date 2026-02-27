@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'sidebar' => config('sidebar'),
+            'csrf_token' => csrf_token(),
         ];
     }
 }
@@ -82,7 +83,7 @@ class HandleInertiaRequests extends Middleware
 // ->withMiddleware(function (Middleware $middleware) {
 //     $middleware->web(append: [
 //         HandleInertiaRequests::class,
-        
+
 //         // Middleware inline (mala práctica)
 //         function ($request, $next) {
 //             if (!auth()->check()) {
@@ -90,7 +91,7 @@ class HandleInertiaRequests extends Middleware
 //             }
 //             return $next($request);
 //         },
-        
+
 //         // Otro middleware inline
 //         function ($request, $next) {
 //             // Lógica aquí...

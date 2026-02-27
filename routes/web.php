@@ -22,3 +22,7 @@ Route::get('/reservation/search', [ReservationController::class, 'search'])->nam
 Route::get('/reservation/search/{id}', [ReservationController::class, 'searchId'])->name('reservationSearchId')->middleware(['auth']);
 
 Route::post('/registerReservation', [ReservationController::class, 'registerReservation'])->name('reservationCreate')->middleware(['auth']);
+
+Route::patch('/reservations/edit/{id}', [ReservationController::class, 'editreservation'])->name('reservationEdit')->middleware(['auth']);
+
+Route::get('/reservation/searchEdit', [ReservationController::class, 'searchEdit'])->name('reservationSearchEdit')->middleware(['auth']);

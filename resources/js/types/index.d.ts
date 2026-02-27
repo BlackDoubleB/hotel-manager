@@ -98,8 +98,19 @@ export type ReservationProps = {
 export type ReservationPropsSearchId = {
     reservationDataId: dataReservation[];
 };
-
 export type reservationColumnsHeader = {
     key: string;
     label: string;
+};
+export type dataReservationEdit = {
+    payment_status?: string;
+    reservation_status?: string;
+};
+
+
+export type dataReservationEditArray = {
+    reservationDataEditArray: {
+        paymentStatus: { id: string, payment_status: string }[],
+        reservationStatus: { id: string, reservation_status: string }[]
+    }
 };

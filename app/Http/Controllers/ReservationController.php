@@ -7,9 +7,11 @@ use App\Services\HoursService;
 use App\Services\PaymentStatusService;
 use App\Services\ReservationService;
 use App\Services\ReservationStatusService;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\RoomData;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReservationController extends Controller
 {
@@ -72,5 +74,33 @@ class ReservationController extends Controller
         $res = $rs->registerReservation($data);
 
         return response()->json($res);
+    }
+
+    public function editReservation(Request $rq, ReservationService $rs, $id)
+    {
+        $service = $rs->updateReservation($rq, $id);
+        // Se puede llamar json() porque response() devuelve la instancia de ResponseFactory
+        // (resuelta por el contenedor de servicios), que tiene el método json().
+        return response()->json($service);
+
+
+        //Necesitamos que si no se genera actualizacion mandar un codigo de estado manualmente mas mensaje que indique que no se hizo ningun cambio
+        //Si hay cambio mandar 200 
+
+    }
+
+    public function searchEdit(ReservationService $rs)
+    {
+        try {
+            $data = $rs->searchReservationEdit();
+            return response()->json(['reservationDataEditArray' => $data], 200);
+
+        } catch (NotFoundHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+
+        } catch (\Throwable $e) {
+            // por si ocurre un error real inesperado
+            return response()->json(['message' => 'Error interno'], 500);
+        }
     }
 }

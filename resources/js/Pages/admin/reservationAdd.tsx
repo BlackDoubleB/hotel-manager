@@ -136,15 +136,15 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     }, [auth.user?.name]);
 
     function handleChangeDateTime() {
-    //    date?.toISOString().slice(0, 10)
+        //    date?.toISOString().slice(0, 10)
         const selectDate = { date: date?.toISOString().slice(0, 10), room: room };
         axios
             .get("/dateStartTime", { params: selectDate })
             .then(function (response) {
                 console.log("estooooooooooooo ", response.data);
-                
+
                 setDataDateStartAvaible(response.data);
-                 
+
             });
     }
     function handleChangeEndTime() {
@@ -173,279 +173,287 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     }, [room, date]);
 
     return (
-        <div className="p-5 space-y-5 bg-deep-koamaru-50 mx-10 shadow-md">
-            <div className="border-b border-deep-koamaru-100 pb-5">
-                <h1 className="text-gray-950"> {title[0].label}</h1>
-            </div>
-            <form
-                id="reservAddForm"
-                className="grid grid-template-columns-1 md:grid-cols-2 lg:grid-cols-4 gap-4 "
-            >
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="customer">
-                        Customer <span className="text-red-500">*</span>
-                    </Label>
-
-                    <Input
-                        name="customer"
-                        value={customer}
-                        onChange={(e) => setCustomer(e.target.value)}
-                        type="text"
-                        id="customer"
-                        placeholder="Full Name"
-                        className="bg-white"
-                    />
+        <div className="w-full h-full p-4 md:p-6 lg:px-8 ">
+            <div className="max-w-7xl mx-auto space-y-8 bg-white p-6 md:p-8 lg:p-10 rounded-[2rem] shadow-sm border border-gray-100">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+                    <div className="space-y-1">
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                            {title[0]?.label || "New Reservation"}
+                        </h1>
+                        <p className="text-sm text-gray-500 font-medium">Capture a new reservation quickly and effectively.</p>
+                    </div>
                 </div>
+                <form
+                    id="reservAddForm"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="customer">
+                            Customer <span className="text-red-500">*</span>
+                        </Label>
 
-                <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
-                    <Label htmlFor="administrator">Administrator</Label>
-                    <Input
-                        id="user_id"
-                        value={auth.user?.id}
-                        name="user_id"
-                        type="text"
-                        className="hidden"
-                    />
-                    <Input
-                        id="user_id"
-                        value={auth.user?.name}
-                        type="text"
-                        className="opacity-50"
-                    />
-                </div>
+                        <Input
+                            name="customer"
+                            value={customer}
+                            onChange={(e) => setCustomer(e.target.value)}
+                            type="text"
+                            id="customer"
+                            placeholder="Full Name"
+                            className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none"
+                        />
+                    </div>
 
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="date" className="px-1">
-                        Reservation Date <span className="text-red-500">*</span>
-                    </Label>
-                    <input
-                        className="hidden"
-                        name="reservation_date"
-                        value={date ? date.toISOString().slice(0, 10) : ""}
-                    />
-                    <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                id="date"
-                                className="w-48 justify-between font-normal"
+                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                        <Label htmlFor="administrator">Administrator</Label>
+                        <Input
+                            id="user_id"
+                            value={auth.user?.id}
+                            name="user_id"
+                            type="text"
+                            className="hidden"
+                        />
+                        <Input
+                            id="user_id_display"
+                            value={auth.user?.name}
+                            type="text"
+                            className="h-11 w-full rounded-xl border-dashed border-zinc-300 shadow-none text-zinc-600 bg-zinc-200/60 cursor-not-allowed font-medium opacity-80"
+                            readOnly
+                        />
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="date">
+                            Reservation Date <span className="text-red-500">*</span>
+                        </Label>
+                        <input
+                            className="hidden"
+                            name="reservation_date"
+                            value={date ? date.toISOString().slice(0, 10) : ""}
+                        />
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    id="date"
+                                    className="w-full justify-between font-normal h-11 rounded-xl border-zinc-200 shadow-sm text-zinc-900 hover:bg-zinc-50 hover:text-zinc-900 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 outline-none transition-all"
+                                >
+                                    {date
+                                        ? date.toLocaleDateString()
+                                        : "Select date"}
+                                    <ChevronDownIcon className="h-4 w-4 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                                className="w-auto overflow-hidden p-0"
+                                align="start"
                             >
-                                {date
-                                    ? date.toLocaleDateString()
-                                    : "Select date"}
-                                <ChevronDownIcon />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                            className="w-auto overflow-hidden p-0"
-                            align="start"
+                                <Calendar
+                                    mode="single"
+                                    startMonth={
+                                        new Date(
+                                            datePicker.getFullYear(),
+                                            datePicker.getMonth()
+                                        )
+                                    }
+                                    endMonth={
+                                        new Date(
+                                            datePicker.getFullYear(),
+                                            datePicker.getMonth() + 3
+                                        )
+                                    }
+                                    disabled={matcher}
+                                    selected={date}
+                                    captionLayout="dropdown"
+                                    onSelect={(date) => {
+                                        setDate(date);
+                                        setOpen(false);
+                                    }}
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="room">
+                            Room <span className="text-red-500">*</span>
+                        </Label>
+                        <input
+                            type="text"
+                            className="hidden"
+                            name="room"
+                            value={room}
+                        />
+                        <Select
+                            value={room}
+                            onValueChange={setRoom}
+                            disabled={!date}
                         >
-                            <Calendar
-                                mode="single"
-                                startMonth={
-                                    new Date(
-                                        datePicker.getFullYear(),
-                                        datePicker.getMonth()
-                                    )
-                                }
-                                endMonth={
-                                    new Date(
-                                        datePicker.getFullYear(),
-                                        datePicker.getMonth() + 3
-                                    )
-                                }
-                                disabled={matcher}
-                                selected={date}
-                                captionLayout="dropdown"
-                                onSelect={(date) => {
-                                    setDate(date);
-                                    setOpen(false);
-                                }}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
+                            <SelectTrigger className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {numberRoom.map(function (number) {
+                                    return (
+                                        <SelectItem
+                                            value={String(number.id)}
+                                            key={String(number.id)}
+                                        >
+                                            {number.room_number}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="room">
-                        Room <span className="text-red-500">*</span>
-                    </Label>
-                    <input
-                        type="text"
-                        className="hidden"
-                        name="room"
-                        value={room}
-                    />
-                    <Select
-                        value={room}
-                        onValueChange={setRoom}
-                        disabled={!date}
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="start_time">
+                            Start Time <span className="text-red-500">*</span>
+                        </Label>
+                        <input
+                            type="string"
+                            name="start_time"
+                            value={hourStart}
+                            className="hidden"
+                        />
+                        <Select
+                            value={hourStart}
+                            onValueChange={setHourStart}
+                            disabled={!date || !room}
+                        >
+                            <SelectTrigger className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {dataDateStartAvaible.hours_start.map(function (
+                                    hour
+                                ) {
+                                    return (
+                                        <SelectItem value={hour} key={hour}>
+                                            {hour}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="end_time">
+                            End Time <span className="text-red-500">*</span>
+                        </Label>
+                        <input
+                            type="text"
+                            name="end_time"
+                            value={hourEnd}
+                            className="hidden"
+                        />
+                        <Select
+                            value={hourEnd}
+                            onValueChange={setHourEnd}
+                            disabled={!date || !room || !hourStart}
+                        >
+                            <SelectTrigger className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {dataDateEndAvaible.hours_end.map(function (hour) {
+                                    return (
+                                        <SelectItem value={hour} key={hour}>
+                                            {hour}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                        <Label htmlFor="reservation_status_id">
+                            Reserve Status
+                        </Label>
+                        <Input
+                            name="reservation_status_id"
+                            type="text"
+                            className="hidden"
+                            value={status_reserv[0][0]}
+                        />
+                        <Input
+                            id="reservation_status_id"
+                            type="text"
+                            className="h-11 w-full rounded-xl border-dashed border-zinc-300 shadow-none text-zinc-600 bg-zinc-200/60 cursor-not-allowed font-medium opacity-80"
+                            value={status_reserv[0][1]}
+                            readOnly
+                        />
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3">
+                        <Label htmlFor="payment_status_id">
+                            Payment Status <span className="text-red-500">*</span>
+                        </Label>
+                        <input
+                            type="text"
+                            name="payment_status_id"
+                            className="hidden"
+                            value={paymentStatus}
+                        />
+                        <Select
+                            onValueChange={setPaymentStatus}
+                            value={paymentStatus}
+                        >
+                            <SelectTrigger id="payment_status_id" className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {status_payment.map((x) => {
+                                    return (
+                                        <SelectItem
+                                            value={x[0].toString()}
+                                            key={x[0].toString()}
+                                        >
+                                            {x[1]}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                        <Label htmlFor="payment_id">Payment Amount</Label>
+                        <Input
+                            name="payment_id"
+                            value={payment_id[0][0].toString()}
+                            type="text"
+                            id="payment_id"
+                            className="hidden"
+                        />
+                        <Input
+                            value={payment_id[0][1].toString()}
+                            type="text"
+                            id="payment_id"
+                            className="h-11 w-full rounded-xl border-dashed border-zinc-300 shadow-none text-zinc-600 bg-zinc-200/60 cursor-not-allowed font-medium opacity-80"
+                            readOnly
+                        />
+                    </div>
+                </form>
+                <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-100">
+                    <Button
+                        type="button"
+                        className="w-40 bg-orange-500 hover:bg-orange-600 text-zinc-100 border border-zinc-200 rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
+                        form="reservAddForm"
                     >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {numberRoom.map(function (number) {
-                                return (
-                                    <SelectItem
-                                        value={String(number.id)}
-                                        key={String(number.id)}
-                                    >
-                                        {number.room_number}
-                                    </SelectItem>
-                                );
-                            })}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="start_time">
-                        Start Time <span className="text-red-500">*</span>
-                    </Label>
-                    <input
-                        type="string"
-                        name="start_time"
-                        value={hourStart}
-                        className="hidden"
-                    />
-                    <Select
-                        value={hourStart}
-                        onValueChange={setHourStart}
-                        disabled={!date || !room}
+                        Cancelar
+                    </Button>
+                    <Button
+                        formAction={formAction}
+                        type="submit"
+                        className="w-40 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
+                        form="reservAddForm"
                     >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {dataDateStartAvaible.hours_start.map(function (
-                                hour
-                            ) {
-                                return (
-                                    <SelectItem value={hour} key={hour}>
-                                        {hour}
-                                    </SelectItem>
-                                );
-                            })}
-                        </SelectContent>
-                    </Select>
+                        Guardar Reserva
+                    </Button>
                 </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="end_time">
-                        End Time <span className="text-red-500">*</span>
-                    </Label>
-                    <input
-                        type="text"
-                        name="end_time"
-                        value={hourEnd}
-                        className="hidden"
-                    />
-                    <Select
-                        value={hourEnd}
-                        onValueChange={setHourEnd}
-                        disabled={!date || !room || !hourStart}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {dataDateEndAvaible.hours_end.map(function (hour) {
-                                return (
-                                    <SelectItem value={hour} key={hour}>
-                                        {hour}
-                                    </SelectItem>
-                                );
-                            })}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
-                    <Label htmlFor="reservation_status_id">
-                        Reserve Status
-                    </Label>
-                    <Input
-                        name="reservation_status_id"
-                        type="text"
-                        className="hidden"
-                        value={status_reserv[0][0]}
-                    />
-                    <Input
-                        id="reservation_status_id"
-                        type="text"
-                        className="cursor-auto opacity-50"
-                        value={status_reserv[0][1]}
-                        readOnly
-                    />
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="payment_status_id">
-                        Payment Status <span className="text-red-500">*</span>
-                    </Label>
-                    <input
-                        type="text"
-                        name="payment_status_id"
-                        className="hidden"
-                        value={paymentStatus}
-                    />
-                    <Select
-                        onValueChange={setPaymentStatus}
-                        value={paymentStatus}
-                    >
-                        <SelectTrigger id="payment_status_id">
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {status_payment.map((x) => {
-                                return (
-                                    <SelectItem
-                                        value={x[0].toString()}
-                                        key={x[0].toString()}
-                                    >
-                                        {x[1]}
-                                    </SelectItem>
-                                );
-                            })}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
-                    <Label htmlFor="payment_id">Payment Amount</Label>
-                    <Input
-                        name="payment_id"
-                        value={payment_id[0][0].toString()}
-                        type="text"
-                        id="payment_id"
-                        className="hidden"
-                    />
-                    <Input
-                        value={payment_id[0][1].toString()}
-                        type="text"
-                        id="payment_id"
-                        className="bg-white opacity-50"
-                        readOnly
-                    />
-                </div>
-            </form>
-            <div className="flex gap-5">
-                <Button
-                    type="button"
-                    className="w-40 bg-orange-600 rounded-sm shadow-md"
-                    form="reservAddForm"
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    formAction={formAction}
-                    type="submit"
-                    className="w-40 bg-deep-koamaru-900/90 rounded-sm shadow-md"
-                    form="reservAddForm"
-                >
-                    Guardar Reserva
-                </Button>
             </div>
         </div>
     );
