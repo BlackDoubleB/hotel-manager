@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { dataReservationEdit, reservationColumnsHeader, ReservationProps } from "@/types";
 import clsx from "clsx";
 import { memo } from "react";
+import "../../styles/styles.css";
+import { getStatusColors } from "@/lib/statusColors";
 
 type SearchTableProps = {
     dataHeader: reservationColumnsHeader[];
@@ -60,12 +62,13 @@ const SearchTable = memo(function SearchTable({
                                     <TableCell className="py-3 px-4 text-zinc-600">{item.start_time}</TableCell>
                                     <TableCell className="py-3 px-4 text-zinc-600">{item.end_time}</TableCell>
                                     <TableCell className="py-3 px-4">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  border  ${getStatusColors(item.payment_status)}`}>
                                             {item.payment_status}
                                         </span>
                                     </TableCell>
                                     <TableCell className="py-3 px-4">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColors(item.reservation_status)}`}>
                                             {item.reservation_status}
                                         </span>
                                     </TableCell>

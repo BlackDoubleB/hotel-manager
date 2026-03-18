@@ -3,13 +3,15 @@ import { Link, router, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCallback, useMemo, useState, useEffect } from "react";
+import { CheckCircle2, AlertCircle, X } from "lucide-react";
 import SearchTable from "@/components/reservations/search/table";
 import { dataReservation, dataReservationEdit, dataReservationEditArray, PagePropsAuth, ReservationProps } from "@/types";
 import PaginationButton from "@/components/reservations/search/buttonPagination";
 import ModalView from "@/components/reservations/search/modalView";
 import { fetchCsrf } from "./Helpers/fetchCsrf";
-import ModalEdit from "@/components/reservations/search/modalEdit";
+import ModalEdit from "@/components/reservations/modals/edit";
 function ReservationSearch() {
+
     const tokenData = usePage().props;
     const { sidebar } = usePage<PagePropsAuth>().props;
     const { reservationsData } = usePage<ReservationProps>().props;
@@ -41,6 +43,14 @@ function ReservationSearch() {
     const [openEdit, setOpenEdit] = useState(false);
 
     const [dataReservationEditArray, setDataReservationEditArray] = useState<dataReservationEditArray | undefined>(undefined);
+
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [toast, setToast] = useState<{ show: boolean; message: string; type: "success" | "error" | null }>({
+        show: false,
+        message: "",
+        type: null,
+    });
+
     function changePage(page: number) {
         router.get(
             "/reservation/search",
@@ -66,54 +76,78 @@ function ReservationSearch() {
 
     function filterPage() {
         const status_reserv = valueFilter.trim();
-
-        if (!status_reserv) return;
-
         const convertMin = status_reserv.toLocaleLowerCase();
-        setPagesInterfaz([...pages]);
-        router.get(
-            "/reservation/search",
-            { reservation_status: convertMin },
-            { preserveScroll: true, preserveState: true },
-        );
+        if (status_reserv) {
+
+            setPagesInterfaz([...pages]);
+            router.get(
+                "/reservation/search",
+                { reservation_status: convertMin },
+                { preserveScroll: true, preserveState: true },
+            );
+        }
+        else if (!status_reserv) router.get(
+            "/reservation/search"
+        );;
     }
 
     //Esto se crea en el primer render, pero no se ejecuta hasta que se llama a la funcion
     const viewReserv = useCallback(async function ViewReserv(id: number, action: "view" | "edit") {
-        const res = await fetchCsrf(`/reservation/search/${id}`, {
-            method: "GET",
-        }, tokenData.csrf_token as string);
 
-        if (!res.ok) throw new Error("Error en la respuesta");
+        try {
+            if (action === "view") {
+                const res = await fetchCsrf(`/reservation/search/${id}`, {
+                    method: "GET",
+                }, tokenData.csrf_token as string);
 
-        const valor = await res.json();
+                if (!res.ok) throw new Error("Error en la respuesta al buscar detalle");
 
-        if (action == "view") setOpenView(true);
-        if (action == "edit") {
-            const resSearchEdit = await fetchCsrf(`/reservation/searchEdit`, {
-                method: "GET",
-            }, tokenData.csrf_token as string);
-            if (!resSearchEdit.ok) throw new Error("Error en la respuesta");
-            const valorEdit: dataReservationEditArray = await resSearchEdit.json();
-            //obtener el primer registro de objeto con los dos arrays
-            setDataReservationEditArray(valorEdit);
-            setDataReservationId(valor.reservationDataId[0]);
-            setOpenEdit(true);
+                const valor = await res.json();
+                const reservationId = valor?.reservationDataId?.[0];
+                if (!reservationId) throw new Error("No llegó reservationDataId");
+
+                setDataReservationId(reservationId)
+                setOpenView(true)
+            }
+
+            else if (action === "edit") {
+                setOpenEdit(true);
+                setDataReservationEditArray(undefined);
+                setDataReservationId(undefined);
+                const [res, resSearchEdit] = await Promise.all([
+                    fetchCsrf(`/reservation/search/${id}`, {
+                        method: "GET",
+                    }, tokenData.csrf_token as string),
+                    fetchCsrf(`/reservation/searchEdit`, {
+                        method: "GET",
+                    }, tokenData.csrf_token as string)
+                ]);
+
+                if (!resSearchEdit.ok || !res.ok) throw new Error("Error obteniendo los datos");
+
+                const valor = await res.json();
+                const valorEdit: dataReservationEditArray = await resSearchEdit.json();
+                const reservationData = valor?.reservationDataId?.[0];
+
+                if (!reservationData) throw new Error("No llegaron los datos de la reservación");
+
+                setDataReservationEditArray(valorEdit);
+                setDataReservationId(reservationData);
+            }
+
+        } catch (error) {
+            console.error(error);
         }
 
     }, [tokenData.csrf_token]);
 
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
-    console.log(toast);
-
-    // Auto-hide toast after 3 seconds
+    // Auto-hide toast after 4 seconds
     useEffect(() => {
         if (toast.show) {
-            const timer = setTimeout(() => setToast({ ...toast, show: false }), 3000);
+            const timer = setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 4000);
             return () => clearTimeout(timer);
         }
-    }, [toast.show]);
+    }, [toast.show, toast.message, toast.type]);
 
     const editReserv = useCallback(async function EditReserv(dataform: dataReservationEdit, dataId: string) {
         setIsProcessing(true);
@@ -135,24 +169,22 @@ function ReservationSearch() {
 
 
             if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`HTTP ${res.status} : ${text}`);
+                const text = await res.json();
+                throw new Error(`${text.message}`);
             }
             router.reload({
                 only: ['reservationsData'],
                 onSuccess: () => {
                     setOpenEdit(false);
-                    setToast({ show: true, message: "Reservation updated successfully!" });
+                    setToast({ show: true, message: "Reservation updated successfully!", type: "success" });
                 },
                 onFinish: () => setIsProcessing(false) // Whether success or fail, stop loading
 
             });
 
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
             setIsProcessing(false);
-            alert("Failed to update reservation");
-            throw error;
+            setToast({ show: true, message: error?.message || "Something went wrong", type: "error" });
         };
 
     }, [tokenData.csrf_token]);
@@ -160,18 +192,41 @@ function ReservationSearch() {
     return (
         <div className="w-full h-full p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-8 bg-white p-6 md:p-8 lg:p-10 rounded-[2rem] shadow-sm border border-gray-100">
-                {/* Toast Notification */}
+                {/* Professional Toast Notification */}
                 <div
-                    className={`fixed bottom-8 right-8 z-50 transition-all duration-400 transform ${toast.show ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-10 scale-95 pointer-events-none"
+                    className={`fixed bottom-8 right-8 z-[100] transition-all duration-500 transform ease-[cubic-bezier(0.23,1,0.32,1)] ${toast.show
+                        ? "translate-y-0 opacity-100 scale-100"
+                        : "translate-y-8 opacity-0 scale-90 pointer-events-none"
                         }`}
                 >
-                    <div className="bg-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
-                        <div className="bg-white/20 rounded-full p-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                            </svg>
+                    <div className={`relative flex items-center gap-4 px-5 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 backdrop-blur-md min-w-[340px] ${toast.type === "error" ? "bg-red-600/95" : "bg-green-600/95"
+                        }`}>
+                        {/* Icon Section */}
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-white/20">
+                            {toast.type === "success" ? (
+                                <CheckCircle2 className="h-6 w-6 text-white" />
+                            ) : (
+                                <AlertCircle className="h-6 w-6 text-white" />
+                            )}
                         </div>
-                        <span className="font-semibold tracking-wide">{toast.message}</span>
+
+                        {/* Content Section */}
+                        <div className="flex-1 pr-4">
+                            <h4 className="text-[12px] font-bold text-white uppercase tracking-wider mb-0.5 opacity-80">
+                                {toast.type === "success" ? "Success" : "Error"}
+                            </h4>
+                            <p className="text-[15px] text-white font-medium leading-tight">
+                                {toast.message}
+                            </p>
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                            className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition-all duration-200"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
 
@@ -211,7 +266,7 @@ function ReservationSearch() {
                             </div>
                             <Input
                                 type="text"
-                                placeholder="Search by status..."
+                                placeholder="reservation status..."
                                 className="pl-10 h-11 w-full rounded-xl border border-zinc-200 bg-white focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 shadow-sm transition-all text-zinc-900 placeholder:text-zinc-400"
                                 value={valueFilter}
                                 onChange={(e) => setValueFilter(e.target.value)}
@@ -258,15 +313,16 @@ function ReservationSearch() {
                     setOpenView={setOpenView}
                 />
 
-                    <ModalEdit
-                        dataReservationId={dataReservationId}
-                        openEdit={openEdit}
-                        setOpenEdit={setOpenEdit}
-                        editReserv={editReserv}
-                        isProcessing={isProcessing}
-                        dataReservationEditArray={dataReservationEditArray}
-                    />
 
+                <ModalEdit
+                    dataReservationId={dataReservationId}
+                    openEdit={openEdit}
+                    setOpenEdit={setOpenEdit}
+                    editReserv={editReserv}
+                    isProcessing={isProcessing}
+                    dataReservationEditArray={dataReservationEditArray}
+
+                />
             </div>
         </div>
     );

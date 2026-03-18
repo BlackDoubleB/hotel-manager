@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\RoomData;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class ReservationController extends Controller
 {
@@ -78,14 +79,18 @@ class ReservationController extends Controller
 
     public function editReservation(Request $rq, ReservationService $rs, $id)
     {
-        $service = $rs->updateReservation($rq, $id);
-        // Se puede llamar json() porque response() devuelve la instancia de ResponseFactory
-        // (resuelta por el contenedor de servicios), que tiene el método json().
-        return response()->json($service);
+        try {
+            $service = $rs->updateReservation($rq, $id);
+            // Se puede llamar json() porque response() devuelve la instancia de ResponseFactory
+            // (resuelta por el contenedor de servicios), que tiene el método json().
+            return response()->json($service);
 
 
-        //Necesitamos que si no se genera actualizacion mandar un codigo de estado manualmente mas mensaje que indique que no se hizo ningun cambio
-        //Si hay cambio mandar 200 
+            //Necesitamos que si no se genera actualizacion mandar un codigo de estado manualmente mas mensaje que indique que no se hizo ningun cambio
+            //Si hay cambio mandar 200 
+        } catch (Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
 
     }
 
@@ -98,7 +103,7 @@ class ReservationController extends Controller
         } catch (NotFoundHttpException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // por si ocurre un error real inesperado
             return response()->json(['message' => 'Error interno'], 500);
         }

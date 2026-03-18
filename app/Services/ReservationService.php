@@ -100,17 +100,20 @@ class ReservationService
         $reservation = Reservation::find($id);
 
         if (!$reservation) {
+
             return ["message" => "Reservation not found"];
         }
 
         //fill: sobrescribe  atributos de reservation por los del rq
         //Importante: $fillable Aunque coincidan los nombres, si no están en $fillable, Laravel no los asigna por seguridad.
         $reservation->fill($rq->all());
-        if ($reservation->save()) {
-            return ["message" => "successful update"];
-        }
 
-        return ["message" => "update failed"];
+        if ($reservation->isDirty()) {
+            if ($reservation->save()) {
+                return ["message" => "successful update"];
+            }
+        }
+        throw new Exception("There are no changes");
     }
 
     function searchReservationEdit()

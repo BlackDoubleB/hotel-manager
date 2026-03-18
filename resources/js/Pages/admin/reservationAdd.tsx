@@ -33,6 +33,8 @@ import {
 import { DateBefore } from "react-day-picker";
 import axios from "axios";
 import { useActionState } from "react";
+import { useCallback } from 'react';
+import ModalRegister from "@/components/reservations/modals/register";
 
 type ReservationFormState = {
     user_id: string;
@@ -48,6 +50,7 @@ type ReservationFormState = {
 
 type RegisterReservationResponse = {
     message: string;
+    status?: string;
 };
 function ReservationAdd({ numberRoom }: ReservationAddProps) {
     const { auth } = usePage<PageProps>().props;
@@ -65,7 +68,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     const [hourEnd, setHourEnd] = useState<string>("");
     const [customer, setCustomer] = useState<string>("");
     const [paymentStatus, setPaymentStatus] = useState<string>("");
-
+    const [responseProcess, setResponseProcess] = useState<boolean>(true);
     let [dataDateStartAvaible, setDataDateStartAvaible] =
         useState<DataHoursStart>({ hours_start: [] });
     let [dataDateEndAvaible, setDataDateEndAvaible] = useState<DataHoursEnd>({
@@ -81,11 +84,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             .find((row) => row.startsWith(name + "="))
             ?.split("=")[1];
     }
+    const [dataValidate, setDataValidate] = useState<Record<string, string>>({});
 
-    async function registerReserv(
+    const registerReserv = useCallback(async function registerReserv(
         previos: RegisterReservationResponse,
         formData: FormData
     ): Promise<RegisterReservationResponse> {
+
+        console.log("form data", formData);
         const form: ReservationFormState = {
             customer: formData.get("customer")?.toString() || "",
             user_id: formData.get("user_id")?.toString() || "",
@@ -104,6 +110,24 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             payment_id: formData.get("payment_id")?.toString() || "",
         };
 
+        Object.entries(form).forEach(([key, value]) => {
+            if (value.toString().trim() === "" || value === 0) {
+                setDataValidate(prev => ({ ...prev, [key]: "El campo es requerido" }));
+            }
+            if (value.toString().trim() !== "" && value !== 0) {
+                setDataValidate(prev => {
+                    const newState = { ...prev };
+                    delete newState[key];
+                    return newState;
+                });
+            }
+        })
+
+        if ((Object.values(form).some(valor => valor === "")) === true) {
+            return { message: "Ocurrio un error" };
+        }
+        setResponseProcess(false);
+
         const xsrf = getCookie("XSRF-TOKEN");
         const headers: HeadersInit = {
             "Content-Type": "application/json",
@@ -119,12 +143,17 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             credentials: "same-origin",
             headers,
             body: JSON.stringify(form),
-        }).then((res) => {
+        }).then(async (res) => {
             if (res.ok) {
-                return res.json();
+                const data = await res.json();
+                setTimeout(() => {
+                    setResponseProcess(true);
+                }, 5000);
+                
+                return { ...data, status: "200" };
             } else return { message: "Ocurrio un error" };
         });
-    }
+    }, [])
 
     const [state, formAction] = useActionState(registerReserv, prevState);
 
@@ -141,8 +170,6 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
         axios
             .get("/dateStartTime", { params: selectDate })
             .then(function (response) {
-                console.log("estooooooooooooo ", response.data);
-
                 setDataDateStartAvaible(response.data);
 
             });
@@ -185,9 +212,9 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                 </div>
                 <form
                     id="reservAddForm"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10"
                 >
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="customer">
                             Customer <span className="text-red-500">*</span>
                         </Label>
@@ -201,9 +228,15 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             placeholder="Full Name"
                             className="h-11 w-full rounded-xl border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-4 focus-visible:ring-zinc-400/20 shadow-sm transition-all text-zinc-900 bg-white outline-none"
                         />
+
+                        {dataValidate.customer && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.customer}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative pointer-events-none">
                         <Label htmlFor="administrator">Administrator</Label>
                         <Input
                             id="user_id"
@@ -219,9 +252,10 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             className="h-11 w-full rounded-xl border-dashed border-zinc-300 shadow-none text-zinc-600 bg-zinc-200/60 cursor-not-allowed font-medium opacity-80"
                             readOnly
                         />
+
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="date">
                             Reservation Date <span className="text-red-500">*</span>
                         </Label>
@@ -271,9 +305,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                                 />
                             </PopoverContent>
                         </Popover>
+                        {dataValidate.reservation_date && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.reservation_date}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="room">
                             Room <span className="text-red-500">*</span>
                         </Label>
@@ -304,9 +343,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                                 })}
                             </SelectContent>
                         </Select>
+                        {dataValidate.room_id && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.room_id}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="start_time">
                             Start Time <span className="text-red-500">*</span>
                         </Label>
@@ -336,9 +380,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                                 })}
                             </SelectContent>
                         </Select>
+                        {dataValidate.start_time && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.start_time}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="end_time">
                             End Time <span className="text-red-500">*</span>
                         </Label>
@@ -366,9 +415,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                                 })}
                             </SelectContent>
                         </Select>
+                        {dataValidate.end_time && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.end_time}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative pointer-events-none">
                         <Label htmlFor="reservation_status_id">
                             Reserve Status
                         </Label>
@@ -385,9 +439,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             value={status_reserv[0][1]}
                             readOnly
                         />
+                        {dataValidate.reservation_status_id && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.reservation_status_id}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative">
                         <Label htmlFor="payment_status_id">
                             Payment Status <span className="text-red-500">*</span>
                         </Label>
@@ -417,9 +476,14 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                                 })}
                             </SelectContent>
                         </Select>
+                        {dataValidate.payment_status_id && (
+                            <p className="absolute top-full left-0 mt-1 text-red-500 text-[13px] font-medium">
+                                {dataValidate.payment_status_id}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="grid w-full max-w-sm items-center gap-3 pointer-events-none">
+                    <div className="flex flex-col w-full max-w-sm gap-1.5 relative pointer-events-none">
                         <Label htmlFor="payment_id">Payment Amount</Label>
                         <Input
                             name="payment_id"
@@ -435,6 +499,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                             className="h-11 w-full rounded-xl border-dashed border-zinc-300 shadow-none text-zinc-600 bg-zinc-200/60 cursor-not-allowed font-medium opacity-80"
                             readOnly
                         />
+
                     </div>
                 </form>
                 <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-100">
@@ -446,6 +511,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                         Cancelar
                     </Button>
                     <Button
+                        disabled={!responseProcess}
                         formAction={formAction}
                         type="submit"
                         className="w-40 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
@@ -455,6 +521,9 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                     </Button>
                 </div>
             </div>
+            {state.status === "200" ? (
+                <ModalRegister openModal={true} />
+            ) : null}
         </div>
     );
 }

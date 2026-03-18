@@ -1,0 +1,23 @@
+.pending {
+    background-color: hsl(37, 95%, 92%);
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+.cancelled {
+    background-color: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
+}
+
+.inProgress {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.paid {
+    background-color: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
