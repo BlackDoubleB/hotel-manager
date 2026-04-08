@@ -29,7 +29,7 @@ class ReservationService
 
     function searchReservation(Request $rq)
     {
-        //obtener el query param del rq
+        
         $query_param = $rq->query('reservation_status');
         $reservation = Reservation::with(['user', 'payment', 'payment_status', 'reservation_status', 'room'])->when($query_param, function (Builder $q) use ($query_param) {
             $q->whereHas('reservation_status', function (Builder $query) use ($query_param) {
@@ -39,7 +39,7 @@ class ReservationService
 
         $reservation->getCollection()->transform(function ($data) {
             return [
-                //REASIGNAMOS TODO EL VALOR DE DATA
+                
                 'id' => $data->id,
                 'user_id' => $data->user_id,
                 'payment_id' => $data->payment_id,
@@ -58,20 +58,20 @@ class ReservationService
                 'room' => $data->room?->room_number,
             ];
         });
-        //retornas el sreservation modificado
+        
         return $reservation;
     }
 
     function searchReservationId($id)
     {
-        //obtener el query param del rq
+        
         $reservation = Reservation::with(['user', 'payment', 'payment_status', 'reservation_status', 'room'])->when($id, function (Builder $q) use ($id) {
             $q->where('id', $id);
         })->get();
 
         $reservation->transform(function ($data) {
             return [
-                //REASIGNAMOS TODO EL VALOR DE DATA
+                
                 'id' => $data->id,
                 'user_id' => $data->user_id,
                 'payment_id' => $data->payment_id,
@@ -91,7 +91,7 @@ class ReservationService
             ];
         });
 
-        //retornas el sreservation modificado
+        
         return $reservation;
     }
 
@@ -103,9 +103,7 @@ class ReservationService
 
             return ["message" => "Reservation not found"];
         }
-
-        //fill: sobrescribe  atributos de reservation por los del rq
-        //Importante: $fillable Aunque coincidan los nombres, si no están en $fillable, Laravel no los asigna por seguridad.
+        
         $reservation->fill($rq->all());
 
         if ($reservation->isDirty()) {

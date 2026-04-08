@@ -53,7 +53,7 @@ export function AppSidebar() {
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {!open && <SidebarTrigger className="px-4 cursor-pointer"  onClick={() => setOpen(true)}/>}
+                            {!open && <SidebarTrigger className="px-4 cursor-pointer" onClick={() => setOpen(true)} />}
                             {sidebar.map((item) => {
                                 const Icon = iconMap[item.icon] ?? Home;
 
@@ -68,7 +68,7 @@ export function AppSidebar() {
                                             </Link>
                                         </SidebarMenuButton>
 
-                                        {/* <SidebarMenuBadge>24</SidebarMenuBadge> */}
+                                        { }
                                     </SidebarMenuItem>
                                 );
                             })}

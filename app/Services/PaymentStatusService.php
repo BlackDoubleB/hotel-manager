@@ -18,6 +18,5 @@ class PaymentStatusService
             $paymentStatus[] = $dataD;
         }
         return $paymentStatus;
-
     }
 }

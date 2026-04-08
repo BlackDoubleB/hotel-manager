@@ -7,7 +7,6 @@ use App\Services\HoursService;
 use App\Services\PaymentStatusService;
 use App\Services\ReservationService;
 use App\Services\ReservationStatusService;
-use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\RoomData;
@@ -38,7 +37,6 @@ class ReservationController extends Controller
         return response()->json(['reservationDataId' => $data]);
     }
 
-
     public function availabilityStartHours(Request $rq, HoursService $h)
     {
         $roomId = (int) $rq->query('room');
@@ -57,7 +55,6 @@ class ReservationController extends Controller
             'hours_end' => $hoursAvailability
         ]);
     }
-
     public function registerReservation(Request $rq, ReservationService $rs)
     {
         $data = $rq->only([
@@ -81,13 +78,8 @@ class ReservationController extends Controller
     {
         try {
             $service = $rs->updateReservation($rq, $id);
-            // Se puede llamar json() porque response() devuelve la instancia de ResponseFactory
-            // (resuelta por el contenedor de servicios), que tiene el método json().
             return response()->json($service);
 
-
-            //Necesitamos que si no se genera actualizacion mandar un codigo de estado manualmente mas mensaje que indique que no se hizo ningun cambio
-            //Si hay cambio mandar 200 
         } catch (Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -104,7 +96,7 @@ class ReservationController extends Controller
             return response()->json(['message' => $e->getMessage()], 404);
 
         } catch (Throwable $e) {
-            // por si ocurre un error real inesperado
+
             return response()->json(['message' => 'Error interno'], 500);
         }
     }

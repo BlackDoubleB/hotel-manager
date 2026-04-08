@@ -15,17 +15,14 @@ type ModalEditProps = {
 }
 
 export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, editReserv, isProcessing, dataReservationEditArray }: ModalEditProps) {
-    //Si el payment_status dependiera unicamente de dataReservationId solo tomaria el primer valor que le pasen, cuando dataReservationId tenga nuevo valor, el payment_status nunca actualizara
+    
     console.count("ModalEdit render");
     const [payment_status, setPayment_status] = useState<string>(() => String(dataReservationId?.payment_status_id ?? ""));
     const [reservation_status, setReservation_status] = useState(() => String(dataReservationId?.reservation_status_id ?? ""));
-    //Cuando el evento submit se activa, el navegador crea un objeto SubmitEvent y lo pasa automáticamente como argumento a la función manejadora que hayas definido. Como SubmitEvent hereda de la interfaz base Event, ese objeto contiene todas las propiedades y métodos de ambas interfaces. 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!dataReservationId) return;
 
-        // currentTarget solo obtiene el objeto donde se puso el listener
-        // con formdata puedes crear un objeto con los objetos que contiene el objeto asociado del listener, solo los clave valor.
         const formData = new FormData(e.currentTarget);
 
         const dataform: dataReservationEdit = {
@@ -36,31 +33,20 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
         editReserv(dataform, dataId);
     };
 
-    //Actua cuando ya todos los datos estan listos para pintarse
-    //Tanto useEfeect como este evaluan su condicion unicamente en cada render, pero su ejecucion es un momento diferente del ciclo
+    
     useLayoutEffect(() => {
-        // Si el modal se está cerrando o está cerrado, evitamos tocar los estados
-        // así se mantienen los datos cargados mientras dura la animación de 700ms al desaparecer.
         if (!openEdit) return;
-
-        // Si el modal se está abriendo pero los datos asíncronos aún no llegan, 
-        // limpiamos los estados a "" para forzar que se muestren los "esceletos de carga" (skeleton loaders)
         if (!dataReservationId) {
             setPayment_status("");
             setReservation_status("");
             return;
         }
 
-        // Si los datos ya llegaron (Fase 3), los asignamos.
         setPayment_status(String(dataReservationId.payment_status_id ?? ""));
         setReservation_status(String(dataReservationId.reservation_status_id ?? ""));
     }, [openEdit, dataReservationId]);
 
-    //todo el componente ModalEdit() se vuelve a ejecutar completo cada vez que cambian sus props o su state.
-
     return (
-        //recuerda que react tiene props personalizados y propios del framework!
-        //En react el form tiene el atributo onSubmit que es lo mismo que button submit + intercepcion de js.
         <form
             onSubmit={handleSubmit}
             className={clsx(
@@ -78,7 +64,7 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                 role="dialog"
                 aria-modal="true"
             >
-                {/* Header */}
+
                 <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 bg-white text-gray-800">
                     <h2 className="text-xl font-bold text-gray-900">Edit Reservation</h2>
                     <button
@@ -94,7 +80,7 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                     </button>
                 </div>
 
-                {/* Content */}
+                {}
                 <div className="px-6 py-6 space-y-5 bg-gray-50/50 text-gray-700">
                     <div className="grid grid-cols-2 gap-4">
                         {
@@ -131,12 +117,9 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                     </div>
 
                     <div className="space-y-4 pt-2">
-                        {/* En el mismo flujo primero se construye el DOM virtual y ahi si existe dataReservationId con valor y va creando el doc porque cumple la condicion con el caso de 
-                        "dataReservationId && dataReservationEditArray?.reservationDataEditArray.paymentStatus ? " entonces cuando entra ve payment status pero como 
-                         useLayoutEffect que convierte los IDs externos en tus estados locales (payment_status = "1") 
-                        corre un instante después de que React decide cómo construir el HTML, entonces aun no existe por eso el select no se autoselecciona con esa condicion, mejor condiciionar con el ultimo en el flujo que es payment_status_id */}
+                        {}
                         {payment_status ? <>
-                            {/* group  Payment Status*/}
+                            {}
                             <div className="flex flex-col gap-1.5 hidden">
                                 <label htmlFor="payment_status_id" className="text-sm font-semibold text-gray-700">
                                     Payment Status
@@ -151,7 +134,7 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                                 />
                             </div>
 
-                            {/* area select */}
+                            {}
                             <div className="grid w-full max-w-sm items-center gap-3">
                                 <Label htmlFor="payment_status_id">
                                     Payment Status <span className="text-red-500">*</span>
@@ -185,8 +168,8 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {/*  */}
-                            {/* group  Reservation Status*/}
+                            {}
+                            {}
                             <div className="flex flex-col gap-1.5 hidden">
                                 <label htmlFor="reservation_status_id" className="text-sm font-semibold text-gray-700">
                                     Reservation Status
@@ -200,7 +183,7 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
 
                                 />
                             </div>
-                            {/* area select */}
+                            {}
                             <div className="grid w-full max-w-sm items-center gap-3">
                                 <Label htmlFor="reservation_status_id">
                                     Reservation Status <span className="text-red-500">*</span>
@@ -249,7 +232,7 @@ export default function ModalEdit({ dataReservationId, openEdit, setOpenEdit, ed
                     </div>
                 </div>
 
-                {/* Footer */}
+                {}
                 <div className="px-6 py-4 bg-white border-t border-zinc-100">
                     <button
                         type="submit"

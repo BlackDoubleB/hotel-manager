@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reservation extends Model
 {
-   protected $table = 'Reservation';
+    protected $table = 'reservation';
     protected $fillable = [
         'user_id',
         'room_id',
@@ -20,8 +20,8 @@ class Reservation extends Model
         'end_time',
     ];
 
-    //Relationships
-    //El nombre de FK se determina por el nombre del metodo _ id
+    
+    
     public function user(): BelongsTo{
         return $this->belongsTo(User::class);
     }

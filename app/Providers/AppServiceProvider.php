@@ -6,20 +6,14 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public const HOME = '/reservation/create';
+    public const HOME = '/reservations/create';
     public function register(): void
     {
-        //
+        
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        
     }
 }

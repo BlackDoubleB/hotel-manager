@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { CheckCircle2, AlertCircle, X } from "lucide-react";
-import SearchTable from "@/components/reservations/search/table";
+import SearchTable from "@/components/ui/tableReservatión";
 import { dataReservation, dataReservationEdit, dataReservationEditArray, PagePropsAuth, ReservationProps } from "@/types";
-import PaginationButton from "@/components/reservations/search/buttonPagination";
-import ModalView from "@/components/reservations/search/modalView";
+import PaginationButton from "@/components/ui/buttonPagination";
+import ModalView from "@/components/modals/view";
 import { fetchCsrf } from "./Helpers/fetchCsrf";
-import ModalEdit from "@/components/reservations/modals/edit";
+import ModalEdit from "@/components/modals/edit";
 function ReservationSearch() {
 
     const tokenData = usePage().props;
@@ -53,7 +53,7 @@ function ReservationSearch() {
 
     function changePage(page: number) {
         router.get(
-            "/reservation/search",
+            "/reservations",
             {
                 ...(valueFilter ? { reservation_status: valueFilter } : {}),
                 page,
@@ -81,22 +81,22 @@ function ReservationSearch() {
 
             setPagesInterfaz([...pages]);
             router.get(
-                "/reservation/search",
+                "/reservations",
                 { reservation_status: convertMin },
                 { preserveScroll: true, preserveState: true },
             );
         }
         else if (!status_reserv) router.get(
-            "/reservation/search"
+            "/reservations"
         );;
     }
 
-    //Esto se crea en el primer render, pero no se ejecuta hasta que se llama a la funcion
+
     const viewReserv = useCallback(async function ViewReserv(id: number, action: "view" | "edit") {
 
         try {
             if (action === "view") {
-                const res = await fetchCsrf(`/reservation/search/${id}`, {
+                const res = await fetchCsrf(`/reservations/${id}`, {
                     method: "GET",
                 }, tokenData.csrf_token as string);
 
@@ -115,10 +115,10 @@ function ReservationSearch() {
                 setDataReservationEditArray(undefined);
                 setDataReservationId(undefined);
                 const [res, resSearchEdit] = await Promise.all([
-                    fetchCsrf(`/reservation/search/${id}`, {
+                    fetchCsrf(`/reservations/${id}`, {
                         method: "GET",
                     }, tokenData.csrf_token as string),
-                    fetchCsrf(`/reservation/searchEdit`, {
+                    fetchCsrf(`/api/reservations/edit-options`, {
                         method: "GET",
                     }, tokenData.csrf_token as string)
                 ]);
@@ -141,7 +141,7 @@ function ReservationSearch() {
 
     }, [tokenData.csrf_token]);
 
-    // Auto-hide toast after 4 seconds
+
     useEffect(() => {
         if (toast.show) {
             const timer = setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 4000);
@@ -152,10 +152,7 @@ function ReservationSearch() {
     const editReserv = useCallback(async function EditReserv(dataform: dataReservationEdit, dataId: string) {
         setIsProcessing(true);
         try {
-            //En ese momento el request ya ocurrió y res ya tiene la respuesta.
-
-            //problemas: si se edita pero solo cuando envio dos campos, ademas no refresca luego de la modificacion
-            const res = await fetchCsrf(`/reservations/edit/${dataId}`, {
+            const res = await fetchCsrf(`/reservations/${dataId}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     payment_status_id: Number(dataform.payment_status),
@@ -167,7 +164,6 @@ function ReservationSearch() {
             },
                 tokenData.csrf_token as string);
 
-
             if (!res.ok) {
                 const text = await res.json();
                 throw new Error(`${text.message}`);
@@ -178,7 +174,7 @@ function ReservationSearch() {
                     setOpenEdit(false);
                     setToast({ show: true, message: "Reservation updated successfully!", type: "success" });
                 },
-                onFinish: () => setIsProcessing(false) // Whether success or fail, stop loading
+                onFinish: () => setIsProcessing(false)
 
             });
 
@@ -192,7 +188,7 @@ function ReservationSearch() {
     return (
         <div className="w-full h-full p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-8 bg-white p-6 md:p-8 lg:p-10 rounded-[2rem] shadow-sm border border-gray-100">
-                {/* Professional Toast Notification */}
+                { }
                 <div
                     className={`fixed bottom-8 right-8 z-[100] transition-all duration-500 transform ease-[cubic-bezier(0.23,1,0.32,1)] ${toast.show
                         ? "translate-y-0 opacity-100 scale-100"
@@ -201,7 +197,7 @@ function ReservationSearch() {
                 >
                     <div className={`relative flex items-center gap-4 px-5 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 backdrop-blur-md min-w-[340px] ${toast.type === "error" ? "bg-red-600/95" : "bg-green-600/95"
                         }`}>
-                        {/* Icon Section */}
+                        { }
                         <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-white/20">
                             {toast.type === "success" ? (
                                 <CheckCircle2 className="h-6 w-6 text-white" />
@@ -210,7 +206,7 @@ function ReservationSearch() {
                             )}
                         </div>
 
-                        {/* Content Section */}
+                        { }
                         <div className="flex-1 pr-4">
                             <h4 className="text-[12px] font-bold text-white uppercase tracking-wider mb-0.5 opacity-80">
                                 {toast.type === "success" ? "Success" : "Error"}
@@ -220,7 +216,7 @@ function ReservationSearch() {
                             </p>
                         </div>
 
-                        {/* Close Button */}
+                        { }
                         <button
                             onClick={() => setToast(prev => ({ ...prev, show: false }))}
                             className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition-all duration-200"
@@ -230,7 +226,7 @@ function ReservationSearch() {
                     </div>
                 </div>
 
-                {/* Header Section */}
+                { }
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -245,7 +241,7 @@ function ReservationSearch() {
                         className="cursor-pointer group flex items-center justify-center bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 rounded-xl px-6 h-11 shadow-sm transition-all duration-300 hover:shadow-md font-semibold"
                     >
 
-                        <Link href="/reservation/create"> New Reservation
+                        <Link href="/reservations/create"> New Reservation
                             <span className="relative flex items-center z-10">
                                 <svg className="w-5 h-5 mr-2 text-zinc-700 group-hover:text-zinc-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>

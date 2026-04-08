@@ -13,22 +13,22 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
 const formSchema = z
   .object({
-    name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-    email: z.string().email("Correo inválido"),
+    name: z.string().min(2, "Name must have at least 2 characters"),
+    email: z.string().email("Invalid email"),
     password: z
       .string()
-      .min(6, "La contraseña debe tener al menos 6 caracteres"),
+      .min(6, "Password must have at least 6 characters"),
     password_confirmation: z
       .string()
-      .min(6, "La confirmación debe tener al menos 6 caracteres"),
+      .min(6, "Confirmation must have at least 6 characters"),
   })
   .refine((data) => data.password === data.password_confirmation, {
     path: ["password_confirmation"],
-    message: "Las contraseñas no coinciden",
+    message: "Passwords do not match",
   });
 
 export default function RegisterPage() {
@@ -43,7 +43,6 @@ export default function RegisterPage() {
 });
 
 function onSubmit(values: z.infer<typeof formSchema>) {
-  console.log(values);
   router.post("/register", {
     name: values.name,
     email: values.email,
@@ -59,32 +58,32 @@ function onSubmit(values: z.infer<typeof formSchema>) {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8 bg-deep-koamaru-100/30 p-5 rounded-lg shadow-lg "
           >
-            {/* Nombre */}
+            {}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tu nombre" {...field} />
+                    <Input placeholder="Your name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Email */}
+            {}
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Correo</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="tucorreo@ejemplo.com"
+                      placeholder="youremail@example.com"
                       {...field}
                     />
                   </FormControl>
@@ -93,13 +92,13 @@ function onSubmit(values: z.infer<typeof formSchema>) {
               )}
             />
 
-            {/* Password */}
+            {}
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -108,13 +107,13 @@ function onSubmit(values: z.infer<typeof formSchema>) {
               )}
             />
 
-            {/* Confirmación */}
+            {}
             <FormField
               control={form.control}
               name="password_confirmation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirmar contraseña</FormLabel>
+                  <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -123,7 +122,14 @@ function onSubmit(values: z.infer<typeof formSchema>) {
               )}
             />
 
-            <Button type="submit">Registrar usuario</Button>
+            <Button type="submit" className="w-full">Register</Button>
+
+            <div className="text-center text-sm font-medium mt-4">
+                Already have an account?{" "}
+                <Link href="/login" className="text-blue-600 hover:underline">
+                    Sign In here
+                </Link>
+            </div>
           </form>
         </Form>
       </div>

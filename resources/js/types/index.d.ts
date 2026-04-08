@@ -1,6 +1,3 @@
-import { number } from "zod";
-
-//menu items
 type SidebarItem = {
     label: string;
     route: string;
@@ -34,13 +31,13 @@ export type PageProps = SidebarProps & {
     auth: AuthProps;
 };
 
-// SD
 type Room = {
     id: number;
     room_number: number;
     created_at: string;
     updated_at: string;
 };
+
 export type ReservationAddProps = {
     numberRoom: Room[];
 };
@@ -88,6 +85,7 @@ export type dataReservation = {
     reservation_status: string;
     room_number: number;
 };
+
 export type ReservationProps = {
     reservationsData: {
         data: dataReservation[];
@@ -95,6 +93,7 @@ export type ReservationProps = {
         current_page: number;
     };
 };
+
 export type ReservationPropsSearchId = {
     reservationDataId: dataReservation[];
 };
@@ -102,11 +101,11 @@ export type reservationColumnsHeader = {
     key: string;
     label: string;
 };
+
 export type dataReservationEdit = {
     payment_status?: string;
     reservation_status?: string;
 };
-
 
 export type dataReservationEditArray = {
     reservationDataEditArray: {

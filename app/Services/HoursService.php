@@ -27,7 +27,7 @@ class HoursService
         $hour = intval(substr($time, 0, 2));
         $minute = intval(substr($time, 3, 2));
         $seconds = intval(substr($time, 3, 2));
-        //pasando a segundos
+        
         $h = $hour * 60 * 60;
         $m = $minute * 60;
         return $h + $m + $seconds;
@@ -50,7 +50,7 @@ class HoursService
             }
         }
 
-        //si no esta vacio las horas ocupados
+        
         if (count($hours_time_busy) > 0) {
             $rangebussy = [];
 
@@ -85,10 +85,9 @@ class HoursService
 
     public function DateTimesEndAvaible($listHours, $hourStart)
     {
-        //horas fin disponibles
+        
         $newHours = [];
-
-        //recorriendo lista de horas inicio disponibles
+         
         foreach ($listHours as $hour) {
             if ($hour >= $hourStart)
                 $newHours[] = substr($hour, 0, 2) . ':59:59';

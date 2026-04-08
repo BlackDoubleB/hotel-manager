@@ -13,13 +13,13 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
 const formSchema = z.object({
-    email: z.string().email("Correo inválido"),
+    email: z.string().email("Invalid email"),
     password: z
         .string()
-        .min(6, "La contraseña debe tener al menos 6 caracteres"),
+        .min(6, "Password must have at least 6 characters"),
 });
 
 export default function LoginPage() {
@@ -32,7 +32,6 @@ export default function LoginPage() {
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
         router.post("/login", values);
     }
 
@@ -46,16 +45,16 @@ export default function LoginPage() {
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Correo</FormLabel>
+                            <FormLabel>Email</FormLabel>
                             <FormControl>
                                 <Input
                                     type="email"
-                                    placeholder="tucorreo@ejemplo.com"
+                                    placeholder="youremail@example.com"
                                     {...field}
                                 />
                             </FormControl>
                             <FormDescription>
-                                Usa el correo con el que te registraste.
+                                Use the email you registered with.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -66,7 +65,7 @@ export default function LoginPage() {
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Contraseña</FormLabel>
+                            <FormLabel>Password</FormLabel>
                             <FormControl>
                                 <Input
                                     type="password"
@@ -79,7 +78,14 @@ export default function LoginPage() {
                     )}
                 />
 
-                <Button type="submit">Iniciar sesión</Button>
+                <Button type="submit" className="w-full">Sign In</Button>
+
+                <div className="text-center text-sm font-medium mt-4">
+                   Don't have an account?{" "}
+                   <Link href="/register" className="text-blue-600 hover:underline">
+                       Register here
+                   </Link>
+                </div>
             </form>
         </Form>
         </div>

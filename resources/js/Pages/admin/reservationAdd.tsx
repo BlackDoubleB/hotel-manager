@@ -34,7 +34,7 @@ import { DateBefore } from "react-day-picker";
 import axios from "axios";
 import { useActionState } from "react";
 import { useCallback } from 'react';
-import ModalRegister from "@/components/reservations/modals/register";
+import ModalRegister from "@/components/modals/register";
 
 type ReservationFormState = {
     user_id: string;
@@ -91,7 +91,6 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
         formData: FormData
     ): Promise<RegisterReservationResponse> {
 
-        console.log("form data", formData);
         const form: ReservationFormState = {
             customer: formData.get("customer")?.toString() || "",
             user_id: formData.get("user_id")?.toString() || "",
@@ -112,7 +111,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
 
         Object.entries(form).forEach(([key, value]) => {
             if (value.toString().trim() === "" || value === 0) {
-                setDataValidate(prev => ({ ...prev, [key]: "El campo es requerido" }));
+                setDataValidate(prev => ({ ...prev, [key]: "Field is required" }));
             }
             if (value.toString().trim() !== "" && value !== 0) {
                 setDataValidate(prev => {
@@ -124,7 +123,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
         })
 
         if ((Object.values(form).some(valor => valor === "")) === true) {
-            return { message: "Ocurrio un error" };
+            return { message: "An error occurred" };
         }
         setResponseProcess(false);
 
@@ -138,7 +137,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrf);
         }
 
-        return fetch("/registerReservation", {
+        return fetch("/reservations", {
             method: "POST",
             credentials: "same-origin",
             headers,
@@ -149,14 +148,12 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                 setTimeout(() => {
                     setResponseProcess(true);
                 }, 5000);
-                
                 return { ...data, status: "200" };
-            } else return { message: "Ocurrio un error" };
+            } else return { message: "An error occurred" };
         });
     }, [])
 
     const [state, formAction] = useActionState(registerReserv, prevState);
-
     const datePicker = new Date();
     const matcher: DateBefore = { before: datePicker };
 
@@ -165,10 +162,9 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     }, [auth.user?.name]);
 
     function handleChangeDateTime() {
-        //    date?.toISOString().slice(0, 10)
         const selectDate = { date: date?.toISOString().slice(0, 10), room: room };
         axios
-            .get("/dateStartTime", { params: selectDate })
+            .get("/api/reservations/availability/start-time", { params: selectDate })
             .then(function (response) {
                 setDataDateStartAvaible(response.data);
 
@@ -180,7 +176,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             listHoursStart: dataDateStartAvaible.hours_start,
         };
         axios
-            .get("/dateEndTime", { params: selectHourStart })
+            .get("/api/reservations/availability/end-time", { params: selectHourStart })
             .then(function (response) {
                 setDataDateEndAvaible(response.data);
             });
@@ -195,7 +191,6 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     useEffect(() => {
         if (room.trim() && date !== undefined) {
             handleChangeDateTime();
-            console.log("estado");
         }
     }, [room, date]);
 
@@ -508,7 +503,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                         className="w-40 bg-orange-500 hover:bg-orange-600 text-zinc-100 border border-zinc-200 rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
                         form="reservAddForm"
                     >
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button
                         disabled={!responseProcess}
@@ -517,7 +512,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                         className="w-40 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
                         form="reservAddForm"
                     >
-                        Guardar Reserva
+                        Save Reservation
                     </Button>
                 </div>
             </div>

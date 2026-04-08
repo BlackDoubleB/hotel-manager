@@ -6,23 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
+
+
     public function up(): void
     {
         Schema::table('reservation', function (Blueprint $table) {
             $table->string('customer')
-                  ->after('room_id')    // tabla a la que apunta
-                  ->cascadeOnDelete();           // opcional
+                  ->after('room_id')    
+                  ->cascadeOnDelete();           
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    
+
+
     public function down(): void
     {
-        //
+        
     }
 };

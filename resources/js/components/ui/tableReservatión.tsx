@@ -8,10 +8,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { dataReservationEdit, reservationColumnsHeader, ReservationProps } from "@/types";
+import { reservationColumnsHeader, ReservationProps } from "@/types";
 import clsx from "clsx";
 import { memo } from "react";
-import "../../styles/styles.css";
+import "../styles/styles.css";
 import { getStatusColors } from "@/lib/statusColors";
 
 type SearchTableProps = {

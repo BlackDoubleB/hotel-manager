@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-     protected $table = 'Room';
-
+    protected $table = 'room';
      public function reservation(){
         return $this->hasMany(Reservation::class);
     }

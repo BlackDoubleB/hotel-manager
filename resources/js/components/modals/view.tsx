@@ -10,10 +10,10 @@ type ModalViewProps = {
 export default function ModalView({ dataReservationId, openView, setOpenView }: ModalViewProps) {
     return (
         <div
-            // pointer-events-none: permite que los hermanos capturen click(ademas de continuar propagacion a su padre) pero el que lo tiene(incluido hijos) no.
-            // pointer-events-auto: permite que solo el elemento que lo tiene capture click y no sus hermanos.(continua propagacion con su padre)
-            // opacity: un overlay con opacity-0 puede “estar invisible” pero igual bloquear.
-            // Si no hay index el ultimo se pone por encima.
+            
+            
+            
+            
             className={clsx(
                 "fixed inset-0 h-screen flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs px-4 transition-opacity duration-300 z-50",
                 openView
@@ -29,7 +29,7 @@ export default function ModalView({ dataReservationId, openView, setOpenView }: 
                 role="dialog"
                 aria-modal="true"
             >
-                {/* Header */}
+                {}
                 <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-5 bg-white text-zinc-800">
                     <h2 className="text-xl font-bold text-zinc-900">Reservation</h2>
 
@@ -44,7 +44,7 @@ export default function ModalView({ dataReservationId, openView, setOpenView }: 
                     </button>
                 </div>
 
-                {/* Content */}
+                {}
                 <div className="px-6 py-6 space-y-5 bg-zinc-50/50 text-zinc-700">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white p-3 rounded-xl border border-zinc-100 shadow-sm">

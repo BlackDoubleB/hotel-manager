@@ -3,26 +3,20 @@
 return [
     [
         'label' => 'New Reservation',
-        'route' => '/reservation/create',
+        'route' => '/reservations/create',
         'icon'  => 'add',
         'roles' => ['admin', 'user'],
     ],
     [
         'label' => 'Search Reservation',
-        'route' => '/reservation/search',
+        'route' => '/reservations',
         'icon'  => 'search',
         'roles' => ['admin'],
     ],
     [
-        'label' => 'Calendar',
-        'route' => 'reservations.calendar',
-        'icon'  => 'calendar',
+        'label' => 'Places',
+        'route' => '/reservations/places',
+        'icon'  => 'home',
         'roles' => ['admin', 'user'],
-    ],
-    [
-        'label' => 'Payments',
-        'route' => 'reservations.payments',
-        'icon'  => 'creditcard',
-        'roles' => ['admin'], 
-    ],
+    ]
 ];
