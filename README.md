@@ -185,7 +185,7 @@ hotel-manager/
 ## Autor
 
 **Reyna Blacido**  
-Puedes ver mis otros proyectos en mi perfil de [GitHub](https://github.com/doublebl).
+Puedes ver mis otros proyectos en mi perfil de [GitHub](https://github.com/BlackDoubleB).
 
 ---
 
