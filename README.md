@@ -39,7 +39,7 @@ La aplicación está construida con una arquitectura moderna donde:
 - Creación de reservas.
 - Consulta de disponibilidad de horas de inicio y fin.
 - Búsqueda de reservas.
-- Búsqueda de reservas por ID.
+- Búsqueda de reservas por estado.
 - Edición de reservas existentes.
 - Manejo de habitaciones.
 - Manejo de estados de reserva.
