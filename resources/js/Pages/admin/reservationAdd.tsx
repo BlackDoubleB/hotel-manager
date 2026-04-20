@@ -497,10 +497,10 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
 
                     </div>
                 </form>
-                <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-100">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-4 pt-4 border-t border-zinc-100">
                     <Button
                         type="button"
-                        className="w-40 bg-orange-500 hover:bg-orange-600 text-zinc-100 border border-zinc-200 rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
+                        className="w-full sm:w-40 bg-orange-500 hover:bg-orange-600 text-zinc-100 border border-zinc-200 rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
                         form="reservAddForm"
                     >
                         Cancel
@@ -509,7 +509,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
                         disabled={!responseProcess}
                         formAction={formAction}
                         type="submit"
-                        className="w-40 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
+                        className="w-full sm:w-40 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 shadow-sm font-semibold transition-colors duration-200 cursor-pointer"
                         form="reservAddForm"
                     >
                         Save Reservation

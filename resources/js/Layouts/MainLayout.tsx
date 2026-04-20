@@ -16,7 +16,7 @@ export default function MainLayout({ title, children }: MainLayoutProps) {
             <Head title={title} />
             <SidebarProvider >
                 <AppSidebar />
-                <main className="w-full min-h-screen bg-zinc-50 py-10">
+                <main className="flex-1 min-w-0 w-full min-h-screen bg-zinc-50 py-10">
                     {children}
                 </main>
             </SidebarProvider>
