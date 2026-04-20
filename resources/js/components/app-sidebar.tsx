@@ -77,12 +77,12 @@ export function AppSidebar() {
                     <Button
                         onClick={() => router.post("/logout")}
                         variant="outline"
-                        size="icon"
-                        aria-label="Submit"
-                        className="text-zinc-800  w-full self-end cursor-pointer"
+                        size={open ? "default" : "icon"}
+                        aria-label="Logout"
+                        className={`text-zinc-800 self-end transition-all overflow-hidden flex items-center justify-center cursor-pointer ${open ? 'w-full gap-2' : 'size-10'}`}
                     >
-                        Logout
-                        <LogIn />
+                        {open && <span>Logout</span>}
+                        <LogIn className="w-5 h-5 shrink-0" />
                     </Button>
                 </SidebarGroup>
             </SidebarContent>
