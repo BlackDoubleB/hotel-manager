@@ -164,7 +164,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
     function handleChangeDateTime() {
         const selectDate = { date: date?.toISOString().slice(0, 10), room: room };
         axios
-            .get("/api/reservations/availability/start-time", { params: selectDate })
+            .get("/api/reservations/availability/start-times", { params: selectDate })
             .then(function (response) {
                 setDataDateStartAvaible(response.data);
 
@@ -176,7 +176,7 @@ function ReservationAdd({ numberRoom }: ReservationAddProps) {
             listHoursStart: dataDateStartAvaible.hours_start,
         };
         axios
-            .get("/api/reservations/availability/end-time", { params: selectHourStart })
+            .get("/api/reservations/availability/end-times", { params: selectHourStart })
             .then(function (response) {
                 setDataDateEndAvaible(response.data);
             });

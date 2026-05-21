@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Services\PaymentService;
@@ -15,7 +17,12 @@ use Throwable;
 
 class ReservationController extends Controller
 {
-    public function add(RoomData $rd, ReservationStatusService $rs, PaymentStatusService $ps, PaymentService $psa)
+    public function index(ReservationService $rs, Request $rq)
+    {
+        $data = $rs->searchReservation($rq);
+        return Inertia::render('reservationSearch', ['reservationsData' => $data]);
+    }
+    public function create(RoomData $rd, ReservationStatusService $rs, PaymentStatusService $ps, PaymentService $psa)
     {
         $data = $rd->RoomNumber();
         $dataStatus = $rs->ReservStatus();
@@ -26,15 +33,51 @@ class ReservationController extends Controller
             ['numberRoom' => $data, 'status_reserv' => $dataStatus, 'status_payment' => $dataPaymenStatus, 'payment_id' => $dataPaymentAmount]
         );
     }
-    public function search(ReservationService $rs, Request $rq)
-    {
-        $data = $rs->searchReservation($rq);
-        return Inertia::render('reservationSearch', ['reservationsData' => $data]);
-    }
-    public function searchId(ReservationService $rs, $id)
+    public function show(ReservationService $rs, int $id)
     {
         $data = $rs->searchReservationId($id);
         return response()->json(['reservationDataId' => $data]);
+    }
+    public function store(Request $rq, ReservationService $rs)
+    {
+        $data = $rq->only([
+            'user_id',
+            'room_id',
+            'payment_id',
+            'payment_status_id',
+            'reservation_status_id',
+            'customer',
+            'reservation_date',
+            'start_time',
+            'end_time',
+        ]);
+
+        $res = $rs->registerReservation($data);
+
+        return response()->json($res);
+    }
+
+    public function update(Request $rq, ReservationService $rs, $id)
+    {
+        try {
+            $service = $rs->updateReservation($rq, $id);
+            return response()->json($service);
+        } catch (Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function editOptions(ReservationService $rs)
+    {
+        try {
+            $data = $rs->searchReservationEdit();
+            return response()->json(['reservationDataEditArray' => $data], 200);
+        } catch (NotFoundHttpException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (Throwable $e) {
+
+            return response()->json(['message' => 'Error interno'], 500);
+        }
     }
 
     public function availabilityStartHours(Request $rq, HoursService $h)
@@ -54,50 +97,5 @@ class ReservationController extends Controller
         return response()->json([
             'hours_end' => $hoursAvailability
         ]);
-    }
-    public function registerReservation(Request $rq, ReservationService $rs)
-    {
-        $data = $rq->only([
-            'user_id',
-            'room_id',
-            'payment_id',
-            'payment_status_id',
-            'reservation_status_id',
-            'customer',
-            'reservation_date',
-            'start_time',
-            'end_time',
-        ]);
-
-        $res = $rs->registerReservation($data);
-
-        return response()->json($res);
-    }
-
-    public function editReservation(Request $rq, ReservationService $rs, $id)
-    {
-        try {
-            $service = $rs->updateReservation($rq, $id);
-            return response()->json($service);
-
-        } catch (Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-
-    }
-
-    public function searchEdit(ReservationService $rs)
-    {
-        try {
-            $data = $rs->searchReservationEdit();
-            return response()->json(['reservationDataEditArray' => $data], 200);
-
-        } catch (NotFoundHttpException $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-
-        } catch (Throwable $e) {
-
-            return response()->json(['message' => 'Error interno'], 500);
-        }
     }
 }
